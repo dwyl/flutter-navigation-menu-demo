@@ -18,7 +18,13 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const HomePage(),
+      debugShowCheckedModeBanner: false,
+      builder: (context, child) => BaseWidget(child: child),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => FirstRoute(),
+        '/second': (context) => SecondRoute(),
+      },
     );
   }
 }
@@ -82,8 +88,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
         backgroundColor: Colors.black,
         elevation: 0.0,
-        //automaticallyImplyLeading: false,
-        /*
+        automaticallyImplyLeading: false,
         actions: [
           AnimatedBuilder(
             animation: _menuSlideController,
@@ -103,11 +108,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             },
           ),
         ],
-        */
       ),
       body: Stack(
         children: [
-          const SizedBox(),
           AnimatedBuilder(
             animation: _menuSlideController,
             builder: (context, child) {
@@ -119,7 +122,84 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ],
       ),
-      drawer: const DrawerMenu(),
+    );
+  }
+}
+
+class BaseWidget extends StatelessWidget {
+  final Widget? child;
+  const BaseWidget({super.key, this.child});
+
+  List<Widget> _showChild() {
+    if (child != null) {
+      return [
+        Expanded(child: child!),
+      ];
+    } else {
+      return [];
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          title: const Text(
+        'some menu',
+        style: TextStyle(
+          color: Colors.white,
+        ),
+      )),
+      body: Column(
+        children: _showChild(),
+      ),
+    );
+  }
+}
+
+class FirstRoute extends StatelessWidget {
+  const FirstRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const Text("Route 1"),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/second');
+              },
+              child: const Text('Go to second'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+class SecondRoute extends StatelessWidget {
+  const SecondRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          children: [
+            const Text("Route 2"),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Go back to first!'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
