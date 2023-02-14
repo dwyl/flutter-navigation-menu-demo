@@ -1,6 +1,7 @@
+import 'package:app/drawer_menu.dart';
 import 'package:flutter/material.dart';
 
-import 'menu.dart';
+import 'sliding_menu.dart';
 
 void main() {
   runApp(const App());
@@ -81,7 +82,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
         backgroundColor: Colors.black,
         elevation: 0.0,
-        automaticallyImplyLeading: false,
+        //automaticallyImplyLeading: false,
+        /*
         actions: [
           AnimatedBuilder(
             animation: _menuSlideController,
@@ -101,6 +103,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             },
           ),
         ],
+        */
       ),
       body: Stack(
         children: [
@@ -110,12 +113,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             builder: (context, child) {
               return FractionalTranslation(
                 translation: Offset(1.0 - _menuSlideController.value, 0.0),
-                child: _isMenuClosed() ? const SizedBox() : const Menu(),
+                child: _isMenuClosed() ? const SizedBox() : const SlidingMenu(),
               );
             },
           ),
         ],
       ),
+      drawer: const DrawerMenu(),
     );
   }
 }
