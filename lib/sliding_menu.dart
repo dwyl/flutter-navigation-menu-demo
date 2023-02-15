@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'main.dart';
+
 class SlidingMenu extends StatefulWidget {
   const SlidingMenu({super.key});
 
@@ -12,10 +14,10 @@ class _SlidingMenuState extends State<SlidingMenu> {
   Widget build(BuildContext context) {
     return Container(
         color: Colors.black,
-        child: ListView(padding: EdgeInsets.only(top: 32), children: [
+        child: ListView(padding: const EdgeInsets.only(top: 32), children: [
           Container(
             padding: const EdgeInsets.only(top: 15, bottom: 15),
-            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
             child: ListTile(
               leading: const Icon(
                 Icons.check_outlined,
@@ -28,8 +30,7 @@ class _SlidingMenuState extends State<SlidingMenu> {
                     color: Colors.white,
                   )),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                // Do nothing
               },
             ),
           ),
@@ -49,8 +50,11 @@ class _SlidingMenuState extends State<SlidingMenu> {
                   color: Colors.white,
                 )),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const TourPage(),
+                    ),
+                  );
               },
             ),
           ),
@@ -69,8 +73,11 @@ class _SlidingMenuState extends State<SlidingMenu> {
                   color: Colors.white,
                 )),
               onTap: () {
-                // Update the state of the app.
-                // ...
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const SettingsPage(),
+                    ),
+                  );
               },
             ),
           ),

@@ -14,13 +14,12 @@ class App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Navigation Flutter Menu App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      debugShowCheckedModeBanner: false,
-      home: const HomePage()
-    );
+        title: 'Navigation Flutter Menu App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const HomePage());
   }
 }
 
@@ -76,7 +75,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'some menu',
+          'appbar title',
           style: TextStyle(
             color: Colors.white,
           ),
@@ -106,6 +105,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       ),
       body: Stack(
         children: [
+          Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Text(
+              "This is the main page",
+              style: TextStyle(fontSize: 30),
+            ),
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "Open the menu above to check more pages.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+            ),
+          ],
+        ),
+      ),
           AnimatedBuilder(
             animation: _menuSlideController,
             builder: (context, child) {
@@ -121,21 +139,33 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 }
 
-class FirstRoute extends StatelessWidget {
-  const FirstRoute({super.key});
+class TourPage extends StatelessWidget {
+  const TourPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Route 1"),
+            const Text(
+              "This is the Tour page 🚩",
+              style: TextStyle(fontSize: 30),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushNamed(context, '/second');
+                Navigator.pop(context);
               },
-              child: const Text('Go to second'),
+              child: const Text('Go back'),
             ),
           ],
         ),
@@ -144,22 +174,33 @@ class FirstRoute extends StatelessWidget {
   }
 }
 
-
-class SecondRoute extends StatelessWidget {
-  const SecondRoute({super.key});
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("Route 2"),
+            const Text(
+              "This is the Settings page ⚙️",
+              style: TextStyle(fontSize: 30),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+            ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Go back to first!'),
+              child: const Text('Go back'),
             ),
           ],
         ),
