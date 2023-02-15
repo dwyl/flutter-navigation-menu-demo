@@ -72,47 +72,53 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  /* ------- Menu action unblocker ------- */
-  List<Widget> _showMenuActionIcon() {
-    if (showMenu) {
-      return [
-        AnimatedBuilder(
-          animation: _menuSlideController,
-          builder: (context, child) {
-            return IconButton(
-              onPressed: _toggleMenu,
-              icon: _isMenuOpen() || _isMenuOpening()
-                  ? const Icon(
-                      Icons.menu_open,
-                      color: Colors.white,
-                    )
-                  : const Icon(
-                      Icons.menu,
-                      color: Colors.white,
-                    ),
-            );
-          },
-        ),
-      ];
-    } else {
-      return [];
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'some title',
-          style: TextStyle(
-            color: Colors.white,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Image(
+                fit: BoxFit.fitHeight,
+                height: 30,
+                image: NetworkImage("https://avatars.githubusercontent.com/u/11708465?s=400&u=2f0a9dc6e6287f8ac690a8246ce297f8bb81692e&v=4")),
+          ],
+        ),
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+                "https://booth.pximg.net/418438d7-7722-4249-b229-e2737a853b35/i/3827588/0ab8f246-64cd-46a1-9ea2-0b84bfd10ba1_base_resized.jpg"),
           ),
         ),
         backgroundColor: Colors.black,
         elevation: 0.0,
-        automaticallyImplyLeading: false,
-        actions: _showMenuActionIcon(),
+        actions: [
+          AnimatedBuilder(
+            animation: _menuSlideController,
+            builder: (context, child) {
+              return Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: showMenu,
+                child: IconButton(
+                  onPressed: _toggleMenu,
+                  icon: _isMenuOpen() || _isMenuOpening()
+                      ? const Icon(
+                          Icons.menu_open,
+                          color: Colors.white,
+                        )
+                      : const Icon(
+                          Icons.menu,
+                          color: Colors.white,
+                        ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Stack(
         children: [
@@ -133,8 +139,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   ),
                 ),
                 ListTile(
-                  title: Text('check this todo item', style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),),
+                  title: Text(
+                    'check this todo item',
+                    style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
+                  ),
                   minVerticalPadding: 25.0,
+                  tileColor: Colors.black12,
                   onTap: () {
                     setState(() {
                       showMenu = true;
