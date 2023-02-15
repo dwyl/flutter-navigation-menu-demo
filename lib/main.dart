@@ -33,6 +33,7 @@ class HomePage extends StatefulWidget {
 // https://docs.flutter.dev/development/ui/animations/tutorial#animationcontroller
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late AnimationController _menuSlideController;
+  bool showMenu = false;
 
   @override
   void initState() {
@@ -50,6 +51,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
+  /* ------- Animation builder functions ------- */
   bool _isMenuOpen() {
     return _menuSlideController.value == 1.0;
   }
@@ -70,12 +72,39 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
+  /* ------- Menu action unblocker ------- */
+  List<Widget> _showMenuActionIcon() {
+    if (showMenu) {
+      return [
+        AnimatedBuilder(
+          animation: _menuSlideController,
+          builder: (context, child) {
+            return IconButton(
+              onPressed: _toggleMenu,
+              icon: _isMenuOpen() || _isMenuOpening()
+                  ? const Icon(
+                      Icons.menu_open,
+                      color: Colors.white,
+                    )
+                  : const Icon(
+                      Icons.menu,
+                      color: Colors.white,
+                    ),
+            );
+          },
+        ),
+      ];
+    } else {
+      return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'appbar title',
+          'some title',
           style: TextStyle(
             color: Colors.white,
           ),
@@ -83,47 +112,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         backgroundColor: Colors.black,
         elevation: 0.0,
         automaticallyImplyLeading: false,
-        actions: [
-          AnimatedBuilder(
-            animation: _menuSlideController,
-            builder: (context, child) {
-              return IconButton(
-                onPressed: _toggleMenu,
-                icon: _isMenuOpen() || _isMenuOpening()
-                    ? const Icon(
-                        Icons.menu_open,
-                        color: Colors.white,
-                      )
-                    : const Icon(
-                        Icons.menu,
-                        color: Colors.white,
-                      ),
-              );
-            },
-          ),
-        ],
+        actions: _showMenuActionIcon(),
       ),
       body: Stack(
         children: [
           Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text(
-              "This is the main page",
-              style: TextStyle(fontSize: 30),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "This is the main page",
+                  style: TextStyle(fontSize: 30),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    "Check the todo item below to open the menu above to check more pages.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.black87),
+                  ),
+                ),
+                ListTile(
+                  title: Text('check this todo item', style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),),
+                  minVerticalPadding: 25.0,
+                  onTap: () {
+                    setState(() {
+                      showMenu = true;
+                    });
+                  },
+                )
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Text(
-                "Open the menu above to check more pages.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: Colors.black87),
-              ),
-            ),
-          ],
-        ),
-      ),
+          ),
           AnimatedBuilder(
             animation: _menuSlideController,
             builder: (context, child) {
