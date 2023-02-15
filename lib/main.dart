@@ -78,18 +78,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Image(
-                fit: BoxFit.fitHeight,
-                height: 30,
-                image: NetworkImage("https://avatars.githubusercontent.com/u/11708465?s=400&u=2f0a9dc6e6287f8ac690a8246ce297f8bb81692e&v=4")),
+          children: [
+            Image.asset("assets/images/dwyl_logo.png", fit: BoxFit.fitHeight, height: 30),
           ],
         ),
         leading: const Padding(
           padding: EdgeInsets.all(8.0),
           child: CircleAvatar(
-            backgroundImage: NetworkImage(
-                "https://booth.pximg.net/418438d7-7722-4249-b229-e2737a853b35/i/3827588/0ab8f246-64cd-46a1-9ea2-0b84bfd10ba1_base_resized.jpg"),
+            backgroundImage: AssetImage("assets/images/avatar.jpeg"),
           ),
         ),
         backgroundColor: Colors.black,
