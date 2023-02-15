@@ -19,12 +19,7 @@ class App extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      builder: (context, child) => BaseWidget(child: child),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => FirstRoute(),
-        '/second': (context) => SecondRoute(),
-      },
+      home: const HomePage()
     );
   }
 }
@@ -121,37 +116,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             },
           ),
         ],
-      ),
-    );
-  }
-}
-
-class BaseWidget extends StatelessWidget {
-  final Widget? child;
-  const BaseWidget({super.key, this.child});
-
-  List<Widget> _showChild() {
-    if (child != null) {
-      return [
-        Expanded(child: child!),
-      ];
-    } else {
-      return [];
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text(
-        'some menu',
-        style: TextStyle(
-          color: Colors.white,
-        ),
-      )),
-      body: Column(
-        children: _showChild(),
       ),
     );
   }
