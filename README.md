@@ -12,6 +12,17 @@ building a navigation menu in `Flutter`.
 
 </div>
 
+- [Navigation Menu in `Flutter` Demo](#navigation-menu-in-flutter-demo)
+- [Why? 🤷‍](#why-)
+- [What? 💭](#what-)
+- [Who? 👤](#who-)
+- [_How_? 👩‍💻](#how-)
+  - [Prerequisites? 📝](#prerequisites-)
+  - [What we are building 🧱](#what-we-are-building-)
+  - [1. Customizing the `AppBar`](#1-customizing-the-appbar)
+  - [2. Changing the `HomePage` page](#2-changing-the-homepage-page)
+
+
 <br />
 
 # Why? 🤷‍
@@ -235,6 +246,10 @@ which is the case here.
 We've added a simple white one
 with an `Icon.menu`.
 
+> **Note**
+> You may use [`NetworkImage`](https://api.flutter.dev/flutter/painting/NetworkImage-class.html)
+> if you prefer to load images from the internet, instead of locally.
+
 If you run your application,
 you should be able to see the following screen.
 
@@ -334,6 +349,216 @@ class _HomePageState extends State<HomePage> {
 }
 ```
 
+## 2. Changing the `HomePage` page 
+
+According to the wireframes we saw earlier,
+we don't want a counter app,
+nor will we implement a full `todo` app in this demo 
+(it's out of its scope).
+*However*,
+we can make it *simpler*
+and have a simple `todo item` 
+to **enable menu navigation**, 
+as per our `Progressive UI` requirement.
+
+Let's delete the `_incrementCounter()` function
+and `_counter` variable
+inside `_HomePageState`
+and the `floatingActionButton` attribute
+in the `Scaffold` of the `build()` function.
+
+After this,
+we are going to be adding
+a `showMenu` variable in `_HomePageState`,
+a flag that will let us know if we should show 
+the option for the user to open the menu.
+
+```dart
+class _HomePageState extends State<HomePage> {
+  bool showMenu = false;
+```
+
+Next up,
+we are going to be wrapping
+the `IconButton` of the menu
+with a 
+[`Visibility`](https://api.flutter.dev/flutter/widgets/Visibility-class.html)
+widget.
+
+This will allow us to dynamically hide the icon
+*while maintaining the width*,
+so the `AppBar` stays consistent.
+If we had removed the `IconButton` instead,
+the `title` component would fill the remaining space,
+**which is not what we want** ❌.
+
+![visibility](https://user-images.githubusercontent.com/17494745/219121893-8648f7b8-cecb-4ffc-85fb-3927a3d0dd0d.png)
+
+The `actions` component
+of the `appbar` attribute
+in the `Scaffold` of the `build()` function
+inside `_HomePageState` should look like this:
+
+```dart
+    actions: [
+        Visibility(
+        maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: showMenu,
+        child: IconButton(
+            onPressed: () {},
+            icon: const Icon(
+            Icons.menu,
+            color: Colors.white,
+            ),
+        ),
+        ),
+    ],
+```
+
+Now we can change our `_HomePageState` `body`
+with a simple `todo` item
+that will *toggle* this `menu` button.
+
+In the `Scaffold`
+and `body` attribute,
+change it to the following.
+
+```dart
+    body: Center(
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            const Text(
+                "This is the main page",
+                style: TextStyle(fontSize: 30),
+            ),
+            const Padding(
+                padding: EdgeInsets.all(16),
+                child: Text(
+                "Check the todo item below to open the menu above to check more pages.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+                ),
+            ),
+            ListTile(
+                title: Text(
+                'check this todo item',
+                style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
+                ),
+                minVerticalPadding: 25.0,
+                tileColor: Colors.black12,
+                onTap: () {
+                setState(() {
+                    showMenu = true;
+                });
+                },
+            )
+            ],
+        ),
+    ),
+```
+
+We've added some `Text`,
+and a `ListTile` that,
+when pressed,
+**toggles** the `IconButton` to be shown.
+
+If you run the application
+and *click the `todo` item*,
+the menu icon should be toggled on.
+
+![toggle](https://user-images.githubusercontent.com/17494745/219124646-93c6dfff-c62f-44e3-9441-d7b3e4bb824f.gif)
+
+Your `_HomePageState` class 
+now looks like this.
+
+```dart
+class _HomePageState extends State<HomePage> {
+  bool showMenu = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset("assets/images/dwyl_logo.png", fit: BoxFit.fitHeight, height: 30),
+          ],
+        ),
+        leading: const Padding(
+          padding: EdgeInsets.all(8.0),
+          child: CircleAvatar(
+            backgroundImage: AssetImage("assets/images/avatar.jpeg"),
+          ),
+        ),
+        backgroundColor: Colors.black,
+        elevation: 0.0,
+        actions: [
+          Visibility(
+            maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: showMenu,
+            child: IconButton(
+              onPressed: () {},
+              icon: const Icon(
+                Icons.menu,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ],
+      ),
+      body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "This is the main page",
+                  style: TextStyle(fontSize: 30),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    "Check the todo item below to open the menu above to check more pages.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.black87),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    'check this todo item',
+                    style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
+                  ),
+                  minVerticalPadding: 25.0,
+                  tileColor: Colors.black12,
+                  onTap: () {
+                    setState(() {
+                      showMenu = true;
+                    });
+                  },
+                )
+              ],
+            ),
+          ),
+    );
+  }
+}
+```
+
+We've now got the home page sorted
+and the *progressive UI* requirement
+knocked out of the park!
+
+However, we're not done!
+In fact, we need to get into 
+the bread and butter of this demo:
+**implementing the navigation menu**.
+
+Let's do it!
 
 
 
