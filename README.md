@@ -262,7 +262,7 @@ are `leading`, `title` and `actions`.
 
 In the `title` component
 (which is in the middle),
-we added the *dwyl logo*,
+we've added the *dwyl logo*,
 by calling the function
 [`Image.asset()`](https://api.flutter.dev/flutter/widgets/Image/Image.asset.html)
 and passing the path to the `dwyl_logo.png` file
@@ -288,7 +288,7 @@ In the `actions` component,
 we can pass 
 [**an array of actions**](https://api.flutter.dev/flutter/material/AppBar/actions.html),
 which is a list of widgets to display in a row
-*after* the title widget - typically `IconButtons`,
+*to the right* the title widget - typically `IconButtons`,
 which is the case here. 
 We've added a simple white one
 with an `Icon.menu`.
@@ -722,9 +722,7 @@ it's time to go over that! ✍️
 For this demo, 
 we are going to be over
 **two different ways** of 
-doing a navigation menu,
-and discuss where you'd want to use each one.
-
+doing a navigation menu.
 Both of these options will start 
 from the code we left earlier.
 
@@ -985,7 +983,7 @@ return Scaffold(
 Since both of these scenarios are not *ideal*,
 we ought to implement this another way.
 We are going to build our own drawer menu
-that is animationed,
+that is animated,
 with all the links that are defined in the wireframe.
 
 Let's go over each step to get this working!
@@ -1078,7 +1076,7 @@ add the following code:
 
 When `HomePageState` is instanciated,
 `initState()` is called,
-and sets up `_menuSliderController`,
+and sets up `_menuSliderController` - 
 our `AnimationController`! 🎉
 
 The [`dispose()`](https://api.flutter.dev/flutter/widgets/State/dispose.html)
