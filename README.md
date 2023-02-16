@@ -21,6 +21,15 @@ building a navigation menu in `Flutter`.
   - [What we are building 🧱](#what-we-are-building-)
   - [1. Customizing the `AppBar`](#1-customizing-the-appbar)
   - [2. Changing the `HomePage` page](#2-changing-the-homepage-page)
+  - [3. Creating pages to navigate to](#3-creating-pages-to-navigate-to)
+  - [4. Adding the navigation menu](#4-adding-the-navigation-menu)
+  - [4.1 Using the `drawer` attribute in `Scaffold`](#41-using-the-drawer-attribute-in-scaffold)
+  - [4.2 Slider menu with animation](#42-slider-menu-with-animation)
+    - [4.2.1 Simplify `HomePage` and `App` class](#421-simplify-homepage-and-app-class)
+    - [4.2.2 Creating `AnimationController`](#422-creating-animationcontroller)
+    - [4.2.3 Making our animations *work* with `AnimatedBuilder`](#423-making-our-animations-work-with-animatedbuilder)
+    - [4.2.4 Creating `SlidingMenu`](#424-creating-slidingmenu)
+    - [4.2.5 Run the app!](#425-run-the-app)
 
 
 <br />
@@ -560,7 +569,547 @@ the bread and butter of this demo:
 
 Let's do it!
 
+## 3. Creating pages to navigate to 
+
+In the wireframe, 
+the menu currently has three items
+that the user can click
+to navigate into the referring page:
+- the **Todo List**
+- the **Feature Tour** page
+- the **Settings** page
+
+Let's create two simple pages
+that will represent the last two.
+
+In `lib/main.dart`,
+add the following two classes
+at the end of the file.
+Each class will represent each page.
+
+```dart
+class TourPage extends StatelessWidget {
+  const TourPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "This is the Tour page 🚩",
+              style: TextStyle(fontSize: 30),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Go back'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsPage extends StatelessWidget {
+  const SettingsPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              "This is the Settings page ⚙️",
+              style: TextStyle(fontSize: 30),
+            ),
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Go back'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+Both pages are very similar.
+They have some text
+and a button that will allow the user
+to **navigate back**. 
+
+These pages will be later used
+to implement 
+*the navigation menu*.
+
+Speaking of which,
+it's time to go over that! ✍️
 
 
+## 4. Adding the navigation menu
+
+For this demo, 
+we are going to be over
+**two different ways** of 
+doing a navigation menu,
+and discuss where you'd want to use each one.
+
+Both of these options will start 
+from the code we left earlier.
+
+Let's go! 🏃‍♂️
+
+## 4.1 Using the `drawer` attribute in `Scaffold`
+
+//TODO
+
+## 4.2 Slider menu with animation
+
+Let's, for a minute,
+assume that you prefer
+having the `Drawer`
+show up **below the `AppBar`.
+
+There are a couple of ways 
+you could do this.
+- you could add a `Padding` to the drawer.
+This *works* but it's "*hacky*" and dirty. 
+Additionally, 
+this value would have to be updated
+if the `AppBar` height changed, becoming
+[coupled](https://www.geeksforgeeks.org/software-engineering-coupling-and-cohesion/).
+
+```dart
+drawer: Padding(
+    padding: const EdgeInsets.fromLTRB(0, 80, 0, 0),
+    child: Drawer(),
+```
+
+- you could wrap your main `Scaffold`
+in *another* `Scaffold`,
+and use the `Drawer` of 
+the *child `Scaffold`.
+This, however
+is **not recommended**,
+[as it can cause unnecessary behaviour](https://github.com/flutter/flutter/issues/20289).
+
+```dart
+return Scaffold(
+      primary: true,
+      appBar: AppBar(
+        title: Text("Parent Scaffold"),
+        automaticallyImplyLeading: false,
+      ),
+      body: Scaffold(
+        drawer: Drawer(),
+      ),
+    );
+```
+
+Since both of these scenarios are not *ideal*,
+we ought to implement this another way.
+We are going to build our own drawer menu
+that is animationed,
+with all the links that are defined in the wireframe.
+
+Let's go over each step to get this working!
+
+### 4.2.1 Simplify `HomePage` and `App` class
+
+Let's start by simplifying the `HomePage`
+and `App` class.
+We don't really need the `title` variable
+that was boilerplated when we first created the application.
+
+Change these two classes 
+so they look like this.
+
+```dart
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+        title: 'Navigation Flutter Menu App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        debugShowCheckedModeBanner: false,
+        home: const HomePage());
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+```
+
+### 4.2.2 Creating `AnimationController`
+
+We are going to be creating an 
+[`AnimationController`](https://api.flutter.dev/flutter/animation/AnimationController-class.html)
+to play the animation in forward,
+reverse and know its progress systematically.
+ 
+With this in mind, let's create our `AnimationController`!
+In `_HomePageState`, 
+add the following code:
+
+```dart
+  late AnimationController _menuSlideController;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _menuSlideController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 150),
+    );
+  }
+
+  @override
+  void dispose() {
+    _menuSlideController.dispose();
+    super.dispose();
+  }
+
+  /* ------- Animation builder functions ------- */
+  bool _isMenuOpen() {
+    return _menuSlideController.value == 1.0;
+  }
+
+  bool _isMenuOpening() {
+    return _menuSlideController.status == AnimationStatus.forward;
+  }
+
+  bool _isMenuClosed() {
+    return _menuSlideController.value == 0.0;
+  }
+
+  void _toggleMenu() {
+    if (_isMenuOpen() || _isMenuOpening()) {
+      _menuSlideController.reverse();
+    } else {
+      _menuSlideController.forward();
+    }
+  }
+```
+
+When `HomePageState` is instanciated,
+`initState()` is called,
+and sets up `_menuSliderController`,
+our `AnimationController`! 🎉
+
+The [`dispose()`](https://api.flutter.dev/flutter/widgets/State/dispose.html)
+method is called when the object 
+is removed from the tree permanently.
+We are disposing our `_menuSliderController` here
+to avoid any unexpected behaviour.
+
+In addition to this, 
+we are create functions
+to toggle open the menu
+and knowing the status of the animation in real-time.
+We are accessing the 
+[`status`](https://api.flutter.dev/flutter/animation/AnimationController/status.html)
+and [`value`](https://api.flutter.dev/flutter/animation/AnimationController/value.html)
+properties for this.
+
+> **Warning** 
+> You might notice an error pop up in your IDE stating
+> `The argument type '_HomePageState' can't be assigned to the parameter type 'TickerProvider'`.
+> This is because we need to pass a `vsync` argument
+> when creating an `AnimatedController` object.
+> The presence of `vsync` prevents offscreen animations
+> from consuming unnecessary resources.
+>
+> To fix this, 
+> we need to *extend* the class by adding the `SingleTickerProviderStateMixin` mixin.
+> Change the class definition so it looks like the following:
+> `class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin`.
+>
+> For more information,
+> check https://docs.flutter.dev/development/ui/animations/tutorial#animationcontroller.
+
+
+### 4.2.3 Making our animations *work* with `AnimatedBuilder`
+
+Now that we have our own `AnimatedController`,
+we are ready to *use it*!
+For this,
+we are going to be using the
+[`AnimatedBuilder`](https://api.flutter.dev/flutter/widgets/AnimatedBuilder-class.html) class.
+
+We are going to be using 
+`AnimatedBuilder` in two distinct places
+inside `_HomePageState`:
+- on the `IconButton` in the `AppBar`,
+to toggle the animation on and off.
+- on the `body` of the `Scaffold`,
+to create a sliding animation from right to left. 
+
+Let's start with `AppBar`.
+Locate it, check for the `actions` attribute
+and change it to the following piece of code:
+
+```dart
+    actions: [
+        AnimatedBuilder(
+        animation: _menuSlideController,
+        builder: (context, child) {
+            return Visibility(
+            maintainSize: true,
+            maintainAnimation: true,
+            maintainState: true,
+            visible: showMenu,
+            child: IconButton(
+                onPressed: _toggleMenu,
+                icon: _isMenuOpen() || _isMenuOpening()
+                    ? const Icon(
+                        Icons.menu_open,
+                        color: Colors.white,
+                    )
+                    : const Icon(
+                        Icons.menu,
+                        color: Colors.white,
+                    ),
+            ),
+            );
+        },
+        ),
+    ],
+```
+
+We have *wrapped* the `IconButton`
+(which was previously wrapped with the `Visibility` class)
+with `AnimatedBuilder`, using the `_menuSliderController` we created earlier.
+When the `IconButton` is pressed, 
+we call `_toggleMenu`.
+We also change the icon according
+to the status of the menu,
+whether it is opened or not!
+
+Pretty simple, right?
+
+Now let's go over the second change we ought to make.
+Inside the `Scaffold`,
+lcoate the `body` attribute
+and change it to the following:
+
+```dart
+body: Stack(
+        children: [
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  "This is the main page",
+                  style: TextStyle(fontSize: 30),
+                ),
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(
+                    "Check the todo item below to open the menu above to check more pages.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 15, color: Colors.black87),
+                  ),
+                ),
+                ListTile(
+                  title: Text(
+                    'check this todo item',
+                    style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
+                  ),
+                  minVerticalPadding: 25.0,
+                  tileColor: Colors.black12,
+                  onTap: () {
+                    setState(() {
+                      showMenu = true;
+                    });
+                  },
+                )
+              ],
+            ),
+          ),
+          AnimatedBuilder(
+            animation: _menuSlideController,
+            builder: (context, child) {
+              return FractionalTranslation(
+                translation: Offset(1.0 - _menuSlideController.value, 0.0),
+                child: _isMenuClosed() ? const SizedBox() : const SlidingMenu(),
+              );
+            },
+          ),
+        ],
+      ),
+```
+
+We have *wrapped* `Center`
+with a 
+[`Stack`](https://api.flutter.dev/flutter/widgets/Stack-class.html),
+which is extremely useful to overlap children
+in a simple way.
+Which is exactly what we want!
+
+We've added an `AnimatedBuilder`
+as the *second child*
+which uses 
+[`FractionalTranslation`](https://api.flutter.dev/flutter/widgets/FractionalTranslation-class.html)
+to create a translation from right to left.
+
+In here, 
+we are translating a `SlidingMenu()`,
+which we have not created.
+Let's do that!
+
+### 4.2.4 Creating `SlidingMenu`
+
+Let's create a new file
+in `lib`
+and name it `sliding_menu.dart`.
+
+```dart
+import 'package:flutter/material.dart';
+
+import 'main.dart';
+
+class SlidingMenu extends StatelessWidget {
+  const SlidingMenu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+        color: Colors.black,
+        child: ListView(padding: const EdgeInsets.only(top: 32), children: [
+          Container(
+            padding: const EdgeInsets.only(top: 15, bottom: 15),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
+            child: ListTile(
+              leading: const Icon(
+                Icons.check_outlined,
+                color: Colors.white,
+                size: 50,
+              ),
+              title: const Text('Todo List (Personal)',
+                  style: TextStyle(
+                    fontSize: 30,
+                    color: Colors.white,
+                  )),
+              onTap: () {
+                // Do nothing
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(top: 100),
+            padding: const EdgeInsets.only(top: 15, bottom: 15),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+            child: ListTile(
+              leading: const Icon(
+                Icons.flag_outlined,
+                color: Colors.white,
+                size: 40,
+              ),
+              title: const Text('Feature Tour',
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TourPage()),
+                );
+              },
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(top: 15, bottom: 15),
+            decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+            child: ListTile(
+              leading: const Icon(
+                Icons.settings,
+                color: Colors.white,
+                size: 40,
+              ),
+              title: const Text('Settings',
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  )),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
+              },
+            ),
+          ),
+        ]));
+  }
+}
+```
+
+We are creating a `StatelessWidget`
+that will be our menu.
+Our menu is a `ListView`
+with `ListTile`s as children.
+Each `ListTile` is wrapped with a `Container`
+to provide the proper spacing 
+in-between the items 
+so they resemble the wireframe design more closely.
+
+Now you can simply import this new menu
+in the `lib/main.dart` file.
+
+```dart
+import 'sliding_menu.dart';
+```
+
+And we're done!
+
+### 4.2.5 Run the app!
+
+Now that we've created everything we need,
+let's test it out and see if it in action!
+Run the application 
+and you should see the following result!
+
+![final_sliding](https://user-images.githubusercontent.com/17494745/219359834-a4f7962b-9300-4b91-9f62-60d9d51952ab.gif)
+
+
+
+- meter a cor igual ao do sistema
 - colocar duas  hipoteses
 - o que esta atualmente está sem persistir a appbar. Para persistir, teria-se de usar named routes 

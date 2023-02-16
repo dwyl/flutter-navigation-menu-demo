@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 
 import 'main.dart';
 
-class SlidingMenu extends StatefulWidget {
+class SlidingMenu extends StatelessWidget {
   const SlidingMenu({super.key});
 
-  @override
-  State<SlidingMenu> createState() => _SlidingMenuState();
-}
-
-class _SlidingMenuState extends State<SlidingMenu> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -45,16 +40,15 @@ class _SlidingMenuState extends State<SlidingMenu> {
                 size: 40,
               ),
               title: const Text('Feature Tour',
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.white,
-                )),
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  )),
               onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const TourPage(),
-                    ),
-                  );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const TourPage()),
+                );
               },
             ),
           ),
@@ -68,16 +62,15 @@ class _SlidingMenuState extends State<SlidingMenu> {
                 size: 40,
               ),
               title: const Text('Settings',
-                style: TextStyle(
-                  fontSize: 25,
-                  color: Colors.white,
-                )),
+                  style: TextStyle(
+                    fontSize: 25,
+                    color: Colors.white,
+                  )),
               onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SettingsPage(),
-                    ),
-                  );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const SettingsPage()),
+                );
               },
             ),
           ),
