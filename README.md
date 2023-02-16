@@ -25,6 +25,8 @@ building a navigation menu in `Flutter`.
   - [3. Creating pages to navigate to](#3-creating-pages-to-navigate-to)
   - [4. Adding the navigation menu](#4-adding-the-navigation-menu)
   - [4.1 Using the `drawer` attribute in `Scaffold`](#41-using-the-drawer-attribute-in-scaffold)
+  - [4.1.1 Creating menu](#411-creating-menu)
+  - [4.1.2 Run it!](#412-run-it)
   - [4.2 Slider menu with animation](#42-slider-menu-with-animation)
     - [4.2.1 Simplify `HomePage` and `App` class](#421-simplify-homepage-and-app-class)
     - [4.2.2 Creating `AnimationController`](#422-creating-animationcontroller)
@@ -729,7 +731,215 @@ Let's go! 🏃‍♂️
 
 ## 4.1 Using the `drawer` attribute in `Scaffold`
 
-//TODO
+Creating a 
+[**navigation drawer**](https://m3.material.io/components/navigation-drawer/overview)
+in `Flutter` is remarkably simple.
+
+Head over to `lib/main.dart`,
+locate the `_HomePageState` class.
+We are going to be adding a 
+[`GlobalKey`](https://api.flutter.dev/flutter/widgets/GlobalKey-class.html),
+which will be used to identify the `Scaffold` in the entire app,
+but most specifically to be used
+to close the drawer we're implementing *programatically*.
+
+In `_HomePageState`,
+add the following line.
+
+```dart
+final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+```
+
+In the `build()` function, 
+add this key to the 
+`key` attribute of `Scaffold`.
+
+```dart
+    return Scaffold(
+      key: _scaffoldKey,
+      drawerEnableOpenDragGesture: false,
+```
+
+We've also disabled `drawerEnableOpenDragGesture`,
+so the `Drawer` isn't opened with the right-to-left gesture,
+so the user *has* to click the button to open the menu.
+
+In the `IconButton`, 
+in the `actions` attribute of the `Scaffold`,
+we can change the `onPressed` function
+to the following.
+
+```dart
+child: IconButton(
+    onPressed: () {
+    _scaffoldKey.currentState!.openEndDrawer();
+    },
+    icon: const Icon(
+    Icons.menu,
+    color: Colors.white,
+    ),
+),
+```
+
+We are calling the `openEndDrawer()`,
+which will make the drawer appear on screen.
+
+Speaking of which, let's add it!
+In the `Scaffold` widget,
+add the following line:
+
+```dart
+endDrawer: SizedBox(width: MediaQuery.of(context).size.width * 1.0, child: const Drawer(child: DrawerMenu())),
+```
+
+We are using the `endDrawer`
+attribute instead of `drawer`
+because we want the drawer to 
+go from **right-to-left**, 
+not the other way around,
+which is what `drawer` does.
+
+## 4.1.1 Creating menu
+
+In the previous section
+we've used `DrawerMenu()`, 
+which is not implemented.
+
+Let's do it right now!
+Inside `lib`,
+create a file called `menu.dart`
+and use the code shown below:
+
+```dart
+import 'package:flutter/material.dart';
+
+import 'main.dart';
+import 'pages.dart';
+
+class DrawerMenu extends StatelessWidget {
+  const DrawerMenu({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+          backgroundColor: Colors.black,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset("assets/images/dwyl_logo.png", fit: BoxFit.fitHeight, height: 30),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              icon: const Icon(
+                Icons.menu_open,
+                color: Colors.white,
+              ),
+            ),
+          ]),
+      body: Container(
+          color: Colors.black,
+          child: ListView(padding: const EdgeInsets.only(top: 32), children: [
+            Container(
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.check_outlined,
+                  color: Colors.white,
+                  size: 50,
+                ),
+                title: const Text('Todo List (Personal)',
+                    style: TextStyle(
+                      fontSize: 30,
+                      color: Colors.white,
+                    )),
+                onTap: () {
+                  // Do nothing
+                },
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(top: 100),
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.flag_outlined,
+                  color: Colors.white,
+                  size: 40,
+                ),
+                title: const Text('Feature Tour',
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.white,
+                    )),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const TourPage()),
+                  );
+                },
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.only(top: 15, bottom: 15),
+              decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+              child: ListTile(
+                leading: const Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                  size: 40,
+                ),
+                title: const Text('Settings',
+                    style: TextStyle(
+                      fontSize: 25,
+                      color: Colors.white,
+                    )),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SettingsPage()),
+                  );
+                },
+              ),
+            ),
+          ])),
+    );
+  }
+}
+```
+
+The menu is essentially consisted of an 
+`AppBar` and `ListView`,
+with many `ListTile` children,
+each one pertaining to the different page
+the user can navigate into.
+
+The `AppBar` is similar to the one
+found in the `_HomePageState` class.
+
+Each `ListTile` is wrapped in a `Container` class
+with proper spacing to better resemble
+the wireframes detailed in the beginning of this document.
+
+Each item uses a `Navigator.push()` function
+to navigate to the pages
+defined in `lib/pages.dart`.
+
+## 4.1.2 Run it!
+
+And that's it!
+Wasn't it easy?
+
+If you run the app in an emulator or device,
+you will see something similar
+to what's shown in the gif below.
+
+![drawer_final](https://user-images.githubusercontent.com/17494745/219406889-33e7704e-a9e4-44d0-86e3-c1c8cd624a88.gif)
+
 
 ## 4.2 Slider menu with animation
 

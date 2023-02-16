@@ -28,7 +28,6 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-// https://docs.flutter.dev/development/ui/animations/tutorial#animationcontroller
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   bool showMenu = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -103,7 +102,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-      endDrawer: Container(width: MediaQuery.of(context).size.width * 1.0, child: const Drawer(child: DrawerMenu())),
+      endDrawer: SizedBox(width: MediaQuery.of(context).size.width * 1.0, child: const Drawer(child: DrawerMenu())),
     );
   }
 }

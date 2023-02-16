@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'main.dart';
 import 'pages.dart';
 
 class DrawerMenu extends StatelessWidget {
