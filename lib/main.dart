@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'menu.dart';
 
+const iconKey = Key("menu_icon");
+const todoItemKey = Key("todo_item");
+const homePageKey = Key("home_page");
+
+// coverage:ignore-start
 void main() {
   runApp(const App());
 }
+// coverage:ignore-end 
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -59,6 +65,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             maintainState: true,
             visible: showMenu,
             child: IconButton(
+              key: iconKey,
               onPressed: () {
                 _scaffoldKey.currentState!.openEndDrawer();
               },
@@ -71,6 +78,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ],
       ),
       body: Center(
+        key: homePageKey,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -87,6 +95,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ),
             ),
             ListTile(
+              key: todoItemKey,
               title: Text(
                 'check this todo item',
                 style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
@@ -102,7 +111,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-      endDrawer: SizedBox(width: MediaQuery.of(context).size.width * 1.0, child: const Drawer(child: DrawerMenu())),
+      endDrawer: SizedBox(
+        width: MediaQuery.of(context).size.width * 1.0, 
+        child: const Drawer(child: DrawerMenu())),
     );
   }
 }

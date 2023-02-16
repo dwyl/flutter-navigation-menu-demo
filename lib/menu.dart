@@ -2,12 +2,20 @@ import 'package:flutter/material.dart';
 
 import 'pages.dart';
 
+const drawerMenuKey = Key("drawer_menu");
+const todoTileKey = Key("todo_tile");
+const tourTileKey = Key("tour_tile");
+const settingsTileKey = Key("settings_tile");
+
+const closeMenuKey = Key("close_key_icon");
+
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: drawerMenuKey,
       appBar: AppBar(
           backgroundColor: Colors.black,
           leading: Padding(
@@ -16,6 +24,7 @@ class DrawerMenu extends StatelessWidget {
           ),
           actions: [
             IconButton(
+              key: closeMenuKey,
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -27,24 +36,21 @@ class DrawerMenu extends StatelessWidget {
           ]),
       body: Container(
           color: Colors.black,
-          child: ListView(padding: const EdgeInsets.only(top: 32), children: [
+          child: ListView(key: todoTileKey, padding: const EdgeInsets.only(top: 32), children: [
             Container(
               padding: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
-              child: ListTile(
-                leading: const Icon(
+              child: const ListTile(
+                leading: Icon(
                   Icons.check_outlined,
                   color: Colors.white,
                   size: 50,
                 ),
-                title: const Text('Todo List (Personal)',
+                title: Text('Todo List (Personal)',
                     style: TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                     )),
-                onTap: () {
-                  // Do nothing
-                },
               ),
             ),
             Container(
@@ -52,6 +58,7 @@ class DrawerMenu extends StatelessWidget {
               padding: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
               child: ListTile(
+                key: tourTileKey,
                 leading: const Icon(
                   Icons.flag_outlined,
                   color: Colors.white,
@@ -74,6 +81,7 @@ class DrawerMenu extends StatelessWidget {
               padding: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
               child: ListTile(
+                key: settingsTileKey,
                 leading: const Icon(
                   Icons.settings,
                   color: Colors.white,

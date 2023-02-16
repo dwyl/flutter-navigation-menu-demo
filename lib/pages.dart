@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 
+const tourPageKey = Key("tour_page");
+const settingsPageKey = Key("settings_page");
+
 class TourPage extends StatelessWidget {
   const TourPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: tourPageKey,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -41,6 +45,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: settingsPageKey,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

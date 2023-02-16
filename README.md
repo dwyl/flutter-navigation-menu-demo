@@ -846,20 +846,17 @@ class DrawerMenu extends StatelessWidget {
             Container(
               padding: const EdgeInsets.only(top: 15, bottom: 15),
               decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
-              child: ListTile(
-                leading: const Icon(
+              child: const ListTile(
+                leading: Icon(
                   Icons.check_outlined,
                   color: Colors.white,
                   size: 50,
                 ),
-                title: const Text('Todo List (Personal)',
+                title: Text('Todo List (Personal)',
                     style: TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                     )),
-                onTap: () {
-                  // Do nothing
-                },
               ),
             ),
             Container(
