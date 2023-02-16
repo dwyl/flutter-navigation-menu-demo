@@ -18,6 +18,7 @@ building a navigation menu in `Flutter`.
 - [Who? 👤](#who-)
 - [_How_? 👩‍💻](#how-)
   - [Prerequisites? 📝](#prerequisites-)
+  - [Run it! 🏃‍♂️](#run-it-️)
   - [What we are building 🧱](#what-we-are-building-)
   - [1. Customizing the `AppBar`](#1-customizing-the-appbar)
   - [2. Changing the `HomePage` page](#2-changing-the-homepage-page)
@@ -79,11 +80,45 @@ a new `Flutter` project,
 please visit:
 https://github.com/dwyl/learn-flutter#0-setting-up-a-new-project.
 
+
+## Run it! 🏃‍♂️
+
+We assume you've cloned this project,
+since you seem to want to run it 😉.
+
 To run on a real device, check
 https://github.com/dwyl/flutter-stopwatch-tutorial#running-on-a-real-device.
 
 To run on a simulator, check
 https://github.com/dwyl/learn-flutter#0-setting-up-a-new-project.
+
+You can run this app 
+and check *two different approaches*
+to implementing a navigation menu.
+To check both of them,
+all you have to do is
+head over to `main.dart`
+and change the following line.
+
+```dart 
+void main() {
+  runApp(const App());
+}
+```
+
+By default, the app will run with the 
+**Drawer Menu**.
+If you want to check the **Sliding Menu**,
+you simply change this line to.
+
+
+```dart 
+import 'package:app/sliding_main.dart';
+
+void main() {
+  runApp(const SlidingApp());
+}
+```
 
 ##  What we are building 🧱
 
@@ -582,12 +617,15 @@ to navigate into the referring page:
 Let's create two simple pages
 that will represent the last two.
 
-In `lib/main.dart`,
+Create a new file
+in `lib/` called `pages.dart`
 add the following two classes
 at the end of the file.
 Each class will represent each page.
 
 ```dart
+import 'package:flutter/material.dart';
+
 class TourPage extends StatelessWidget {
   const TourPage({super.key});
 
@@ -667,6 +705,10 @@ to **navigate back**.
 These pages will be later used
 to implement 
 *the navigation menu*.
+
+Both pages are similar and should look like this.
+
+<img width="300" alt="image" src="https://user-images.githubusercontent.com/17494745/219383553-8d7e5a75-3c13-43b6-9221-9b932a5528d8.png">
 
 Speaking of which,
 it's time to go over that! ✍️
@@ -1002,7 +1044,7 @@ and name it `sliding_menu.dart`.
 ```dart
 import 'package:flutter/material.dart';
 
-import 'main.dart';
+import 'pages.dart';
 
 class SlidingMenu extends StatelessWidget {
   const SlidingMenu({super.key});
@@ -1110,6 +1152,8 @@ and you should see the following result!
 
 
 
+
+- na seccao de "run it", mostrar como mudar entre as duas opcoes
 - meter a cor igual ao do sistema
 - colocar duas  hipoteses
 - o que esta atualmente está sem persistir a appbar. Para persistir, teria-se de usar named routes 
