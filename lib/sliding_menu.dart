@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'main.dart';
+import 'pages.dart';
 
 class SlidingMenu extends StatelessWidget {
   const SlidingMenu({super.key});
