@@ -33,6 +33,7 @@ building a navigation menu in `Flutter`.
     - [4.2.3 Making our animations *work* with `AnimatedBuilder`](#423-making-our-animations-work-with-animatedbuilder)
     - [4.2.4 Creating `SlidingMenu`](#424-creating-slidingmenu)
     - [4.2.5 Run the app!](#425-run-the-app)
+- [Star the repo! ⭐️](#star-the-repo-️)
 
 
 <br />
@@ -1360,10 +1361,10 @@ and you should see the following result!
 
 ![final_sliding](https://user-images.githubusercontent.com/17494745/219359834-a4f7962b-9300-4b91-9f62-60d9d51952ab.gif)
 
+# Star the repo! ⭐️
 
+If you find this package/repo _useful_,
+please star on GitHub, 
+so that we know! ⭐ 
 
-
-- na seccao de "run it", mostrar como mudar entre as duas opcoes
-- meter a cor igual ao do sistema
-- colocar duas  hipoteses
-- o que esta atualmente está sem persistir a appbar. Para persistir, teria-se de usar named routes 
+Thank you! 🙏 
