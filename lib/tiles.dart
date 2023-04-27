@@ -37,32 +37,38 @@ class _MenuItemState extends State<MenuItem> {
   Widget build(BuildContext context) {
     // If the tile's children is empty, we render the leaf tile
     if (widget.info.tiles.isEmpty) {
-      return ListTile(
-          contentPadding: EdgeInsets.only(left: widget.leftPadding),
-          title: Text(widget.info.title,
-              style: const TextStyle(
-                fontSize: 25,
-                color: Colors.white,
-              )));
+      return Container(
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+        child: ListTile(
+            contentPadding: EdgeInsets.only(left: widget.leftPadding),
+            title: Text(widget.info.title,
+                style: const TextStyle(
+                  fontSize: 25,
+                  color: Colors.white,
+                ))),
+      );
     }
 
     // If the tile has children, we render this as an expandable tile.
     else {
-      return ExpansionTile(
-        tilePadding: EdgeInsets.only(left: widget.leftPadding),
-        title: Text(widget.info.title,
-            style: const TextStyle(
-              fontSize: 25,
-              color: Colors.white,
-            )),
-        trailing: Icon(
-          _expanded ? Icons.expand_less : Icons.arrow_drop_down,
-          color: Colors.white,
+      return Container(
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.only(left: widget.leftPadding),
+          title: Text(widget.info.title,
+              style: const TextStyle(
+                fontSize: 25,
+                color: Colors.white,
+              )),
+          trailing: Icon(
+            _expanded ? Icons.expand_less : Icons.arrow_drop_down,
+            color: Colors.white,
+          ),
+          children: widget.info.tiles.map((tile) => MenuItem(info: tile, leftPadding: widget.leftPadding + 16)).toList(),
+          onExpansionChanged: (bool expanded) {
+            setState(() => _expanded = expanded);
+          },
         ),
-        children: widget.info.tiles.map((tile) => MenuItem(info: tile, leftPadding: widget.leftPadding + 16)).toList(),
-        onExpansionChanged: (bool expanded) {
-          setState(() => _expanded = expanded);
-        },
       );
     }
   }
