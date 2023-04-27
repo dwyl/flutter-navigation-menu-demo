@@ -1,0 +1,45 @@
+[
+  {
+    "id": 1,
+    "title": "People",
+    "tiles": [
+      {
+        "id": 2,
+        "title": "Online Now",
+        "tiles": [
+          {
+            "id": 3,
+            "title": "Family",
+            "tiles": []
+          },
+          {
+            "id": 4,
+            "title": "Friends",
+            "tiles": [
+              {
+                "id": 5,
+                "title": "Sports Team",
+                "tiles": []
+              },
+              {
+                "id": 6,
+                "title": "Gamerz",
+                "tiles": []
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "title": "Work",
+            "tiles": []
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "title": "Everyone",
+        "tiles": []
+      }
+    ]
+  }
+]

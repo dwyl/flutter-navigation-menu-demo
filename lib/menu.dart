@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'pages.dart';
 import 'tiles.dart';
@@ -12,6 +15,15 @@ const closeMenuKey = Key("close_key_icon");
 
 class DrawerMenu extends StatelessWidget {
   const DrawerMenu({super.key});
+
+  Future<List<MenuItemInfo>> _loadMenuItems() async {
+    final String response = await rootBundle.loadString('assets/menu_items.json');
+    List<dynamic> data = await json.decode(response);
+
+    final List<MenuItemInfo> menuItems = data.map((obj) => MenuItemInfo.fromJson(obj)).toList();
+
+    return menuItems;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,14 +49,26 @@ class DrawerMenu extends StatelessWidget {
           ]),
       body: Container(
           color: Colors.black,
-          child: ListView(
-              key: todoTileKey,
-              padding: const EdgeInsets.only(top: 32),
-              children: mockTilesData
-                  .map(
-                    (tile) => MenuItem(tile: tile),
-                  )
-                  .toList())),
+          child: FutureBuilder<List<MenuItemInfo>>(
+              future: _loadMenuItems(),
+              builder: (BuildContext context, AsyncSnapshot<List<MenuItemInfo>> snapshot) {
+                // If the data is correctly loaded
+                if (snapshot.hasData) {
+                  return ListView(
+                      key: todoTileKey,
+                      padding: const EdgeInsets.only(top: 32),
+                      children: snapshot.data!
+                          .map(
+                            (tile) => MenuItem(info: tile),
+                          )
+                          .toList());
+                }
+
+                // While it's not loaded (error or waiting)
+                else {
+                  return const SizedBox.shrink();
+                }
+              })),
     );
   }
 }

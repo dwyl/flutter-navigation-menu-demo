@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 
 /// Class holding the information of the tile
-class BasicTile {
-  final String title;
-  final List<BasicTile> tiles;
+class MenuItemInfo {
+  late String title;
+  late List<MenuItemInfo> tiles;
 
-  BasicTile({required this.title, this.tiles = const []});
+  MenuItemInfo({required this.title, this.tiles = const []});
+
+  /// Converts `json` text to BasicTile
+  MenuItemInfo.fromJson(Map<String, dynamic> json) {
+    title = json['title'];
+    if (json['tiles'] != null) {
+      tiles = [];
+      json['tiles'].forEach((v) {
+        tiles.add(MenuItemInfo.fromJson(v));
+      });
+    }
+  }
 }
 
 /// Custom tile class that expands if there are child tiles or not.
 class MenuItem extends StatefulWidget {
-  final BasicTile tile;
+  final MenuItemInfo info;
   final double leftPadding;
 
-  const MenuItem({super.key, required this.tile, this.leftPadding = 16});
+  const MenuItem({super.key, required this.info, this.leftPadding = 16});
 
   @override
   State<MenuItem> createState() => _MenuItemState();
@@ -25,10 +36,10 @@ class _MenuItemState extends State<MenuItem> {
   @override
   Widget build(BuildContext context) {
     // If the tile's children is empty, we render the leaf tile
-    if (widget.tile.tiles.isEmpty) {
+    if (widget.info.tiles.isEmpty) {
       return ListTile(
           contentPadding: EdgeInsets.only(left: widget.leftPadding),
-          title: Text(widget.tile.title,
+          title: Text(widget.info.title,
               style: const TextStyle(
                 fontSize: 25,
                 color: Colors.white,
@@ -39,7 +50,7 @@ class _MenuItemState extends State<MenuItem> {
     else {
       return ExpansionTile(
         tilePadding: EdgeInsets.only(left: widget.leftPadding),
-        title: Text(widget.tile.title,
+        title: Text(widget.info.title,
             style: const TextStyle(
               fontSize: 25,
               color: Colors.white,
@@ -48,7 +59,7 @@ class _MenuItemState extends State<MenuItem> {
           _expanded ? Icons.expand_less : Icons.arrow_drop_down,
           color: Colors.white,
         ),
-        children: widget.tile.tiles.map((tile) => MenuItem(tile: tile, leftPadding: widget.leftPadding + 16)).toList(),
+        children: widget.info.tiles.map((tile) => MenuItem(info: tile, leftPadding: widget.leftPadding + 16)).toList(),
         onExpansionChanged: (bool expanded) {
           setState(() => _expanded = expanded);
         },
@@ -56,18 +67,3 @@ class _MenuItemState extends State<MenuItem> {
     }
   }
 }
-
-/// Mock data.
-final mockTilesData = <BasicTile>[
-  BasicTile(title: "People", tiles: [
-    BasicTile(title: "Online Now", tiles: [
-      BasicTile(title: "Family"),
-      BasicTile(title: "Friends", tiles: [
-        BasicTile(title: "Sports Team"),
-        BasicTile(title: "Gamerz"),
-      ]),
-      BasicTile(title: "Work")
-    ]),
-    BasicTile(title: "Everyone")
-  ])
-];
