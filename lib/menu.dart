@@ -121,6 +121,7 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
   Widget build(BuildContext context) {
     return ReorderableListView(
       shrinkWrap: true,
+      // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.only(top: 32),
       onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),

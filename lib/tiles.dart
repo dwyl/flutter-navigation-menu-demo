@@ -25,6 +25,8 @@ class MenuItemInfo {
 
 /// Custom tile class that expands if there are child tiles or not.
 class MenuItem extends StatefulWidget {
+
+  // https://stackoverflow.com/questions/59444423/reorderablelistview-does-not-identify-keys-in-custom-widget
   final Key key;
   final MenuItemInfo info;
   final double leftPadding;
