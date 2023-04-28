@@ -48,24 +48,31 @@ class _DrawerMenuState extends State<DrawerMenu> with SettingsManagerMixin {
               ),
             ),
           ]),
-      body: Container(
-          color: Colors.black,
-          child: FutureBuilder<List<MenuItemInfo>>(
-              future: menuItems,
-              builder: (BuildContext context, AsyncSnapshot<List<MenuItemInfo>> snapshot) {
-                // If the data is correctly loaded,
-                // we render a `ReorderableListView` whose children are `MenuItem` tiles.
-                if (snapshot.hasData) {
-                  List<MenuItemInfo> menuItemInfoList = snapshot.data!;
-
-                  return DrawerMenuTilesList(menuItemInfoList: menuItemInfoList);
-                }
-
-                // While it's not loaded (error or waiting)
-                else {
-                  return const SizedBox.shrink();
-                }
-              })),
+          
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+                color: Colors.black,
+                child: FutureBuilder<List<MenuItemInfo>>(
+                    future: menuItems,
+                    builder: (BuildContext context, AsyncSnapshot<List<MenuItemInfo>> snapshot) {
+                      // If the data is correctly loaded,
+                      // we render a `ReorderableListView` whose children are `MenuItem` tiles.
+                      if (snapshot.hasData) {
+                        List<MenuItemInfo> menuItemInfoList = snapshot.data!;
+          
+                        return DrawerMenuTilesList(menuItemInfoList: menuItemInfoList);
+                      }
+          
+                      // While it's not loaded (error or waiting)
+                      else {
+                        return const SizedBox.shrink();
+                      }
+                    })),
+          ),
+        ],
+      ),
     );
   }
 }
