@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 /// Class holding the information of the tile
@@ -23,6 +25,24 @@ class MenuItemInfo {
   }
 }
 
+/// Proxy decorator function that overrides the background color
+/// of the hovered menu item.
+/// See https://github.com/flutter/flutter/issues/45799.
+  Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      builder: (BuildContext context, Widget? child) {
+        final double animValue = Curves.easeInOut.transform(animation.value);
+        final double elevation = lerpDouble(0, 6, animValue)!;
+        return Material(
+          elevation: elevation,
+          color: const Color.fromARGB(255, 76, 76, 76),
+          child: child,
+        );
+      },
+      child: child,
+    );
+  }
 
 // Widget with the list of Menu Item tiles
 class DrawerMenuTilesList extends StatefulWidget {
@@ -71,6 +91,7 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
       // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.only(top: 32),
+      proxyDecorator: _proxyDecorator,
       onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
       children: menuItemInfoList
           .map(
@@ -169,6 +190,7 @@ class _MenuItemState extends State<MenuItem> {
               // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              proxyDecorator: _proxyDecorator,
               onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
               children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile,  leftPadding: widget.leftPadding + 16)).toList(),
             )
