@@ -107,6 +107,7 @@ class _MenuItemState extends State<MenuItem> {
           ),
           children: [
             ReorderableListView(
+              // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
