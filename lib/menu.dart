@@ -1,29 +1,30 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
-import 'pages.dart';
 import 'tiles.dart';
+import 'settings.dart';
 
 const drawerMenuKey = Key("drawer_menu");
-const todoTileKey = Key("todo_tile");
 const tourTileKey = Key("tour_tile");
 const settingsTileKey = Key("settings_tile");
 
 const closeMenuKey = Key("close_key_icon");
 
-class DrawerMenu extends StatelessWidget {
+class DrawerMenu extends StatefulWidget {
   const DrawerMenu({super.key});
 
-  Future<List<MenuItemInfo>> _loadMenuItems() async {
-    final String response = await rootBundle.loadString('assets/menu_items.json');
-    List<dynamic> data = await json.decode(response);
+  @override
+  State<DrawerMenu> createState() => _DrawerMenuState();
+}
 
-    final List<MenuItemInfo> menuItems = data.map((obj) => MenuItemInfo.fromJson(obj)).toList();
+class _DrawerMenuState extends State<DrawerMenu> with SettingsManagerMixin {
+  late Future<List<MenuItemInfo>> menuItems;
 
-    return menuItems;
+  @override
+  void initState() {
+    super.initState();
+    menuItems = loadMenuItems();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -50,18 +51,14 @@ class DrawerMenu extends StatelessWidget {
       body: Container(
           color: Colors.black,
           child: FutureBuilder<List<MenuItemInfo>>(
-              future: _loadMenuItems(),
+              future: menuItems,
               builder: (BuildContext context, AsyncSnapshot<List<MenuItemInfo>> snapshot) {
-                // If the data is correctly loaded
+                // If the data is correctly loaded,
+                // we render a `ReorderableListView` whose children are `MenuItem` tiles.
                 if (snapshot.hasData) {
-                  return ListView(
-                      key: todoTileKey,
-                      padding: const EdgeInsets.only(top: 32),
-                      children: snapshot.data!
-                          .map(
-                            (tile) => MenuItem(info: tile),
-                          )
-                          .toList());
+                  List<MenuItemInfo> menuItemInfoList = snapshot.data!;
+
+                  return DrawerMenuTilesList(menuItemInfoList: menuItemInfoList);
                 }
 
                 // While it's not loaded (error or waiting)
@@ -69,6 +66,62 @@ class DrawerMenu extends StatelessWidget {
                   return const SizedBox.shrink();
                 }
               })),
+    );
+  }
+}
+
+// Widget with the list of Menu Item tiles
+class DrawerMenuTilesList extends StatefulWidget {
+  final List<MenuItemInfo> menuItemInfoList;
+
+  const DrawerMenuTilesList({super.key, required this.menuItemInfoList});
+
+  @override
+  State<DrawerMenuTilesList> createState() => _DrawerMenuTilesListState();
+}
+
+class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
+  late List<MenuItemInfo> menuItemInfoList;
+
+  @override
+  void initState() {
+    super.initState();
+    menuItemInfoList = widget.menuItemInfoList;
+  }
+
+  /// Callback function that reorders the tiles
+  void _reorderTiles(int oldIndex, int newIndex, List<MenuItemInfo> menuItemInfoList) {
+    // an adjustment is needed when moving the tile down the list
+    if (oldIndex < newIndex) {
+      newIndex--;
+    }
+
+    // get the tile we are moving
+    final tile = menuItemInfoList.removeAt(oldIndex);
+
+    // place the tile in the new position
+    menuItemInfoList.insert(newIndex, tile);
+
+    // Update state
+    setState(() {
+      menuItemInfoList = menuItemInfoList;
+    });
+
+    // TODO: update the JSON file (change index_at_level)
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ReorderableListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(top: 32),
+      onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
+      children: menuItemInfoList
+          .map(
+            (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
+          )
+          .toList()
     );
   }
 }
