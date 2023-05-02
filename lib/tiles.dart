@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'settings.dart';
+
 /// Class holding the information of the tile
 class MenuItemInfo {
   late int id;
@@ -23,26 +25,37 @@ class MenuItemInfo {
       });
     }
   }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['index_in_level'] = indexInLevel;
+    data['title'] = title;
+    if (tiles.isNotEmpty) {
+      data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 /// Proxy decorator function that overrides the background color
 /// of the hovered menu item.
 /// See https://github.com/flutter/flutter/issues/45799.
-  Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
-    return AnimatedBuilder(
-      animation: animation,
-      builder: (BuildContext context, Widget? child) {
-        final double animValue = Curves.easeInOut.transform(animation.value);
-        final double elevation = lerpDouble(0, 6, animValue)!;
-        return Material(
-          elevation: elevation,
-          color: const Color.fromARGB(255, 76, 76, 76),
-          child: child,
-        );
-      },
-      child: child,
-    );
-  }
+Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (BuildContext context, Widget? child) {
+      final double animValue = Curves.easeInOut.transform(animation.value);
+      final double elevation = lerpDouble(0, 6, animValue)!;
+      return Material(
+        elevation: elevation,
+        color: const Color.fromARGB(255, 76, 76, 76),
+        child: child,
+      );
+    },
+    child: child,
+  );
+}
 
 // Widget with the list of Menu Item tiles
 class DrawerMenuTilesList extends StatefulWidget {
@@ -87,25 +100,22 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
   @override
   Widget build(BuildContext context) {
     return ReorderableListView(
-      shrinkWrap: true,
-      // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.only(top: 32),
-      proxyDecorator: _proxyDecorator,
-      onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
-      children: menuItemInfoList
-          .map(
-            (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
-          )
-          .toList()
-    );
+        shrinkWrap: true,
+        // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists
+        physics: const NeverScrollableScrollPhysics(),
+        padding: const EdgeInsets.only(top: 32),
+        proxyDecorator: _proxyDecorator,
+        onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
+        children: menuItemInfoList
+            .map(
+              (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
+            )
+            .toList());
   }
 }
 
-
 /// Widget that expands if there are child tiles or not.
 class MenuItem extends StatefulWidget {
-
   // https://stackoverflow.com/questions/59444423/reorderablelistview-does-not-identify-keys-in-custom-widget
   final Key key;
   final MenuItemInfo info;
@@ -117,9 +127,9 @@ class MenuItem extends StatefulWidget {
   State<MenuItem> createState() => _MenuItemState();
 }
 
-class _MenuItemState extends State<MenuItem> {
+class _MenuItemState extends State<MenuItem> with SettingsManagerMixin {
   bool _expanded = false;
-  
+
   late List<MenuItemInfo> menuItemInfoList;
 
   @override
@@ -129,7 +139,9 @@ class _MenuItemState extends State<MenuItem> {
   }
 
   /// Callback function that reorders the tiles
-  void _reorderTiles(int oldIndex, int newIndex, List<MenuItemInfo> menuItemInfoList) {
+  void _reorderTiles(int oldIndex, int newIndex, MenuItemInfo menuItemInfo) {
+    List<MenuItemInfo> menuItemInfoList = menuItemInfo.tiles;
+
     // an adjustment is needed when moving the tile down the list
     if (oldIndex < newIndex) {
       newIndex--;
@@ -141,12 +153,16 @@ class _MenuItemState extends State<MenuItem> {
     // place the tile in the new position
     menuItemInfoList.insert(newIndex, tile);
 
+    // update the `indexInLevel` field of each item to be in order
+    menuItemInfoList.asMap().forEach((index, value) => value.indexInLevel = index);
+
     // Update state
     setState(() {
       menuItemInfoList = menuItemInfoList;
     });
 
-    // TODO: update the JSON file (change index_at_level)
+    // update the menu item object with updated children in the `json` file.
+    updateDeeplyNestedObjectInJson(menuItemInfo, menuItemInfoList);
   }
 
   @override
@@ -191,8 +207,8 @@ class _MenuItemState extends State<MenuItem> {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               proxyDecorator: _proxyDecorator,
-              onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
-              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile,  leftPadding: widget.leftPadding + 16)).toList(),
+              onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
+              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList(),
             )
           ],
           onExpansionChanged: (bool expanded) {
