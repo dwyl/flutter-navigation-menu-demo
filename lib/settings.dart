@@ -1,19 +1,41 @@
 import 'dart:convert';
 
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'tiles.dart';
 
 mixin SettingsManagerMixin {
   final jsonFilePath = 'assets/menu_items.json';
+  final storageKey = 'menuItems';
 
-  /// Returns the `MenuItemInfo` menu list from the `.json` file
+  /// Loads the menu items from local storage.
+  /// If none is found, it loads the menu items from `.json` file.
+  /// Returns a `MenuItemInfo` menu list.
   Future<List<MenuItemInfo>> loadMenuItems() async {
-    // Get string from json
-    final String response = await rootBundle.loadString(jsonFilePath);
-    List<dynamic> data = await json.decode(response);
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    //await prefs.remove(storageKey);
+
+    final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
+
+    String jsonString;
+    // If local storage has content, return it.
+    if (jsonStringFromLocalStorage != null) {
+      jsonString = jsonStringFromLocalStorage;
+    }
+
+    // If not, we initialize it
+    else {
+      // Setting local storage key with json string from file
+      final String jsonStringFromFile = await rootBundle.loadString(jsonFilePath);
+      prefs.setString(storageKey, jsonStringFromFile);
+
+      jsonString = jsonStringFromFile;
+    }
 
     // Converting json to list of MenuItemInfo objects
+    List<dynamic> data = await json.decode(jsonString);
     final List<MenuItemInfo> menuItems = data.map((obj) => MenuItemInfo.fromJson(obj)).toList();
 
     // Return the MenuItemInfo list
@@ -34,12 +56,11 @@ mixin SettingsManagerMixin {
       }
     }
 
-    // Updated json string
+    // Saving updated menu items encoded to json string.
     final jsonString = json.encode(menuItems);
-
-    return null;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(storageKey, jsonString);
   }
-
 
   /// Recursively finds the deeply nested object from a given menu item id [id]
   /// and updates its `tiles` field with [updatedChildren].

@@ -33,6 +33,8 @@ class MenuItemInfo {
     data['title'] = title;
     if (tiles.isNotEmpty) {
       data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    } else {
+      data['tiles'] = [];
     }
     return data;
   }
