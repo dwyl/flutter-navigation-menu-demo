@@ -116,7 +116,8 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> with Settings
             .map(
               (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
             )
-            .toList());
+            .toList()
+          ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)));
   }
 }
 
@@ -214,7 +215,8 @@ class _MenuItemState extends State<MenuItem> with SettingsManagerMixin {
               physics: const NeverScrollableScrollPhysics(),
               proxyDecorator: _proxyDecorator,
               onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
-              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList(),
+              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
+                ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)),
             )
           ],
           onExpansionChanged: (bool expanded) {
