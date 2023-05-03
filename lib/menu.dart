@@ -5,11 +5,13 @@ import 'tiles.dart';
 import 'settings.dart';
 
 const drawerMenuKey = Key("drawer_menu");
+const closeMenuKey = Key("close_key_icon");
+
 const todoTileKey = Key("todo_tile");
 const tourTileKey = Key("tour_tile");
 const settingsTileKey = Key("settings_tile");
 
-const closeMenuKey = Key("close_key_icon");
+const dynamicMenuItemListKey = Key('dynamic_menu_item_list');
 
 class DrawerMenu extends StatefulWidget {
   const DrawerMenu({super.key});
@@ -128,7 +130,7 @@ class _DrawerMenuState extends State<DrawerMenu> with SettingsManagerMixin {
                             if (snapshot.hasData) {
                               List<MenuItemInfo> menuItemInfoList = snapshot.data!;
 
-                              return DrawerMenuTilesList(menuItemInfoList: menuItemInfoList);
+                              return DrawerMenuTilesList(key: dynamicMenuItemListKey, menuItemInfoList: menuItemInfoList);
                             }
 
                             // While it's not loaded (error or waiting)
