@@ -69,7 +69,7 @@ class DrawerMenuTilesList extends StatefulWidget {
   State<DrawerMenuTilesList> createState() => _DrawerMenuTilesListState();
 }
 
-class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
+class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> with SettingsManagerMixin {
   late List<MenuItemInfo> menuItemInfoList;
 
   @override
@@ -91,12 +91,16 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
     // place the tile in the new position
     menuItemInfoList.insert(newIndex, tile);
 
+    // update the `indexInLevel` field of each item to be in order
+    menuItemInfoList.asMap().forEach((index, value) => value.indexInLevel = index);
+
     // Update state
     setState(() {
       menuItemInfoList = menuItemInfoList;
     });
 
-    // TODO: update the JSON file (change index_at_level)
+    // update the menu item object with updated children in the `json` file.
+    updateRootObjectsInJson(menuItemInfoList);
   }
 
   @override
