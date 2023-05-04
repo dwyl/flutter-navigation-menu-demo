@@ -7,5 +7,4 @@ void main() {
 
     expect(item.title, equals('title'));
   });
-
 }

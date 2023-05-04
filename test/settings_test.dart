@@ -1,7 +1,4 @@
-import 'dart:convert';
-
 import 'package:app/settings.dart';
-import 'package:app/tiles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,7 +26,7 @@ void main() {
 
     // Updates nested item inside shared preferences
     updateDeeplyNestedObjectInJson(updatedFriendsMenuItem, []);
-    
+
     expect(listItems.length, equals(2));
   });
 }
