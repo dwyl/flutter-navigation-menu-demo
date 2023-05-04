@@ -20,7 +20,7 @@ class DrawerMenu extends StatefulWidget {
   State<DrawerMenu> createState() => _DrawerMenuState();
 }
 
-class _DrawerMenuState extends State<DrawerMenu> with SettingsManagerMixin {
+class _DrawerMenuState extends State<DrawerMenu> {
   late Future<List<MenuItemInfo>> menuItems;
 
   @override

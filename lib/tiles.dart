@@ -69,7 +69,7 @@ class DrawerMenuTilesList extends StatefulWidget {
   State<DrawerMenuTilesList> createState() => _DrawerMenuTilesListState();
 }
 
-class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> with SettingsManagerMixin {
+class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
   late List<MenuItemInfo> menuItemInfoList;
 
   @override
@@ -134,7 +134,7 @@ class MenuItem extends StatefulWidget {
   State<MenuItem> createState() => _MenuItemState();
 }
 
-class _MenuItemState extends State<MenuItem> with SettingsManagerMixin {
+class _MenuItemState extends State<MenuItem>  {
   bool _expanded = false;
 
   late List<MenuItemInfo> menuItemInfoList;
