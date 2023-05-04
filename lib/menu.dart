@@ -74,7 +74,6 @@ class _DrawerMenuState extends State<DrawerMenu> {
                     ),
                   ),
                   Container(
-                    margin: const EdgeInsets.only(top: 100),
                     padding: const EdgeInsets.only(top: 15, bottom: 15),
                     decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
                     child: ListTile(

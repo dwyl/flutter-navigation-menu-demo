@@ -41,15 +41,15 @@ Future<List<MenuItemInfo>> loadMenuItems() async {
   return menuItems;
 }
 
-/// Updates the root menu item list [menuItems].
-updateRootObjectsInJson(List<MenuItemInfo> menuItems) async {
+/// Updates the root menu item list [menuItems] in shared preferences.
+updateRootObjectsInPreferences(List<MenuItemInfo> menuItems) async {
   final jsonString = json.encode(menuItems);
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   prefs.setString(storageKey, jsonString);
 }
 
-/// Update deeply nested menu item [item] with a new [updatedChildren].
-updateDeeplyNestedObjectInJson(MenuItemInfo itemToUpdate, List<MenuItemInfo> updatedChildren) async {
+/// Update deeply nested menu item [item] with a new [updatedChildren] in shared preferences.
+updateDeeplyNestedObjectInPreferences(MenuItemInfo itemToUpdate, List<MenuItemInfo> updatedChildren) async {
   // Fetch the menu items from `.json` file
   List<MenuItemInfo> menuItems = await loadMenuItems();
 

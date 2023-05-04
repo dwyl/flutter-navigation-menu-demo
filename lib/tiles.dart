@@ -100,7 +100,7 @@ class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
     });
 
     // update the menu item object with updated children in the `json` file.
-    updateRootObjectsInJson(menuItemInfoList);
+    updateRootObjectsInPreferences(menuItemInfoList);
   }
 
   @override
@@ -169,7 +169,7 @@ class _MenuItemState extends State<MenuItem> {
     });
 
     // update the menu item object with updated children in the `json` file.
-    updateDeeplyNestedObjectInJson(menuItemInfo, menuItemInfoList);
+    updateDeeplyNestedObjectInPreferences(menuItemInfo, menuItemInfoList);
   }
 
   @override

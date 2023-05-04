@@ -25,7 +25,7 @@ void main() {
     final updatedFriendsMenuItem = listItems.elementAt(0).tiles.elementAt(0).tiles.elementAt(1);
 
     // Updates nested item inside shared preferences
-    updateDeeplyNestedObjectInJson(updatedFriendsMenuItem, []);
+    updateDeeplyNestedObjectInPreferences(updatedFriendsMenuItem, []);
 
     expect(listItems.length, equals(2));
   });
