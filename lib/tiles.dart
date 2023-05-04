@@ -134,7 +134,7 @@ class MenuItem extends StatefulWidget {
   State<MenuItem> createState() => _MenuItemState();
 }
 
-class _MenuItemState extends State<MenuItem>  {
+class _MenuItemState extends State<MenuItem> {
   bool _expanded = false;
 
   late List<MenuItemInfo> menuItemInfoList;

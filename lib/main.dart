@@ -10,7 +10,7 @@ const homePageKey = Key("home_page");
 void main() {
   runApp(const App());
 }
-// coverage:ignore-end 
+// coverage:ignore-end
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -111,9 +111,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ],
         ),
       ),
-      endDrawer: SizedBox(
-        width: MediaQuery.of(context).size.width * 1.0, 
-        child: const Drawer(child: DrawerMenu())),
+      endDrawer: SizedBox(width: MediaQuery.of(context).size.width * 1.0, child: const Drawer(child: DrawerMenu())),
     );
   }
 }
