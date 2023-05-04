@@ -25,14 +25,21 @@ building a navigation menu in `Flutter`.
   - [3. Creating pages to navigate to](#3-creating-pages-to-navigate-to)
   - [4. Adding the navigation menu](#4-adding-the-navigation-menu)
   - [4.1 Using the `drawer` attribute in `Scaffold`](#41-using-the-drawer-attribute-in-scaffold)
-  - [4.1.1 Creating menu](#411-creating-menu)
-  - [4.1.2 Run it!](#412-run-it)
+    - [4.1.1 Creating menu](#411-creating-menu)
+    - [4.1.2 Run it!](#412-run-it)
   - [4.2 Slider menu with animation](#42-slider-menu-with-animation)
     - [4.2.1 Simplify `HomePage` and `App` class](#421-simplify-homepage-and-app-class)
     - [4.2.2 Creating `AnimationController`](#422-creating-animationcontroller)
     - [4.2.3 Making our animations *work* with `AnimatedBuilder`](#423-making-our-animations-work-with-animatedbuilder)
     - [4.2.4 Creating `SlidingMenu`](#424-creating-slidingmenu)
     - [4.2.5 Run the app!](#425-run-the-app)
+  - [5. Adding a dynamic section to the menu](#5-adding-a-dynamic-section-to-the-menu)
+    - [5.1 How the `JSON` will look like](#51-how-the-json-will-look-like)
+    - [5.2 Dealing with information from the `JSON` file](#52-dealing-with-information-from-the-json-file)
+    - [5.2.1 `MenuItemInfo` class](#521-menuiteminfo-class)
+    - [5.2.2 Loading menu items from `JSON` file/local storage](#522-loading-menu-items-from-json-filelocal-storage)
+    - [5.2.3 Updating menu items](#523-updating-menu-items)
+    - [5.2.4 Updating menu items](#524-updating-menu-items)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -798,7 +805,7 @@ go from **right-to-left**,
 not the other way around,
 which is what `drawer` does.
 
-## 4.1.1 Creating menu
+### 4.1.1 Creating menu
 
 In the previous section
 we've used `DrawerMenu()`, 
@@ -925,7 +932,7 @@ Each item uses a `Navigator.push()` function
 to navigate to the pages
 defined in `lib/pages.dart`.
 
-## 4.1.2 Run it!
+### 4.1.2 Run it!
 
 And that's it!
 Wasn't it easy?
@@ -1355,6 +1362,345 @@ Run the application
 and you should see the following result!
 
 ![final_sliding](https://user-images.githubusercontent.com/17494745/219359834-a4f7962b-9300-4b91-9f62-60d9d51952ab.gif)
+
+
+## 5. Adding a dynamic section to the menu
+
+You now have working menu!
+But what if we want to make it **dynamic**
+by reading contents from a `JSON` file
+and persisting it on local storage?
+
+This is what we are going to be focusing on 
+for the next sections.
+
+Before this,
+let's make some preparations:
+
+- let's move the `sliding_main.dart` and `sliding_menu.dart`
+files to a folder called `alt`. 
+This folder is localed in `lib`, making it `lib/alt`.
+We're doing this because we are going to be using
+the `Drawer` menu, so we'll just tidy up our workspace.
+
+- make sure that in your `main.dart`,
+you're calling the app like so.
+
+```dart
+void main() {
+  runApp(const App());
+}
+```
+
+- install the 
+[`shared_preferences`](https://pub.dev/packages/shared_preferences) package.
+This will make it easy for us to save
+stuff in the device's local storage!
+
+- open `pubspec.yaml` 
+and add `- assets/` to the `assets:` section.
+
+```yml
+  assets:
+    - assets/images/
+    - assets/
+```
+
+And now you're ready!
+
+### 5.1 How the `JSON` will look like
+
+Let's start with an initial view 
+of how the `JSON` file will look like.
+We are assuming we are going to have 
+**nested menus up to 3 levels deep**.
+For each `Menu Item` we will need:
+- a `title`.
+- an `id`.
+- a field `index_in_level` 
+referring to the index of the menu item within the level.
+- a `tiles` field,
+pertaining to the child `menu items`/`tiles` of it.
+
+If you want to see how the file should look like,
+do check [`assets/menu_items.json`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/3cb94b701377889cc7243a0aba9b4facf67314ab/assets/menu_items.json).
+
+
+### 5.2 Dealing with information from the `JSON` file
+
+Let's create a file called `settings.dart` inside `lib`.
+In this file we will create functions
+that will load the information from the `JSON` file,
+save it in the device's local storage 
+and update it accordingly.
+
+### 5.2.1 `MenuItemInfo` class
+
+In this file we will create a class called `MenuItemInfo`.
+This is the class that will represent
+each menu item that is loaded from the `JSON` file.
+
+Open `lib/settings.dart`
+and add the following code to it.
+
+```dart
+/// Class holding the information of the tile
+class MenuItemInfo {
+  late int id;
+  late int indexInLevel;
+  late String title;
+  late List<MenuItemInfo> tiles;
+
+  MenuItemInfo({required this.id, required this.title, this.tiles = const []});
+
+  /// Converts `json` text to BasicTile
+  MenuItemInfo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    indexInLevel = json['index_in_level'];
+    title = json['title'];
+    if (json['tiles'] != null) {
+      tiles = [];
+      json['tiles'].forEach((v) {
+        tiles.add(MenuItemInfo.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['index_in_level'] = indexInLevel;
+    data['title'] = title;
+    if (tiles.isNotEmpty) {
+      data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    } else {
+      data['tiles'] = [];
+    }
+    return data;
+  }
+}
+```
+
+We are creating a class field
+for each key of the object within the `JSON` file.
+The functions `fromJson` and `toJson`
+convert the information from the `JSON` file
+into a `MenuItemInfo` and decode into a `json` string,
+respectively. 
+
+Awesome! 🎉
+
+
+### 5.2.2 Loading menu items from `JSON` file/local storage
+
+Now that we have our own class,
+let's create a function to load these menu items
+from the file!
+
+In the same `settings.dart` file,
+create the following function.
+
+```dart
+const jsonFilePath = 'assets/menu_items.json';
+const storageKey = 'menuItems';
+
+Future<List<MenuItemInfo>> loadMenuItems() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
+
+  String jsonString;
+  // If local storage has content, return it.
+  if (jsonStringFromLocalStorage != null) {
+    jsonString = jsonStringFromLocalStorage;
+  }
+
+  // If not, we initialize it
+  else {
+    // Setting local storage key with json string from file
+    final String jsonStringFromFile = await rootBundle.loadString(jsonFilePath);
+    prefs.setString(storageKey, jsonStringFromFile);
+
+    jsonString = jsonStringFromFile;
+  }
+
+  // Converting json to list of MenuItemInfo objects
+  List<dynamic> data = await json.decode(jsonString);
+  final List<MenuItemInfo> menuItems = data.map((obj) => MenuItemInfo.fromJson(obj)).toList();
+
+  // Return the MenuItemInfo list
+  return menuItems;
+}
+```
+
+In our application,
+we will persist the `JSON` file string
+into the device's local storage 
+and update it accordingly.
+With this in mind,
+in the beginning of this function
+we check if there is any 
+`json` string in the device's local storage.
+
+If **the `json` string is saved into our local storage**,
+we simply use it to later decode it
+into a list of `MenuItemInfo` (class we've created previously).
+If **the `json` string is not saved into our local storage**,
+we fetch it from the `assets/menu_items.json` file
+and then later decode it in a similar fashion.
+
+This function returns 
+a list of `MenuItemInfo`.
+
+
+### 5.2.3 Updating menu items
+
+If the user wants to reorder the menu items,
+we need to update these changes into our local storage
+so it's always up-to-date and reflects the true state
+of the list of menu items.
+
+When a user reorders a menu item in any level except the root,
+we update the `tiles` list field (which pertains to the children menu items)
+of the parent.
+
+> **Note**
+>
+> Reordering *root menu items* is much easier
+> because we don't need to traverse the tree of menu items.
+> We just need to update the indexes of each men item on root level.
+
+![update_example](https://user-images.githubusercontent.com/17494745/236282208-2160b55f-947f-4e03-80b4-3cbba4c02a14.png)
+
+Since we are importing information from the `JSON` file,
+we don't know upfront how many levels the nested menu has.
+Therefore,
+we need a way to **traverse it**.
+
+According to the image,
+we traverse the tree of menu items 
+until we find the menu item with the given `id`.
+After the menu item is found, 
+we update its children with the reordered list.
+
+Let's create a 
+[recursive](https://en.wikipedia.org/wiki/Recursion_(computer_science)) 
+function that will traverse the tree
+of menu items and update 
+a menu item with a given `id`.
+
+Inside the same file `settings.dart`,
+add the following function.
+
+```dart
+MenuItemInfo? _findAndUpdateMenuItem(MenuItemInfo item, int id, List<MenuItemInfo> updatedChildren) {
+  // Breaking case
+  if (item.id == id) {
+    item.tiles = updatedChildren;
+    return item;
+  }
+
+  // Continue searching
+  else {
+    final children = item.tiles;
+    MenuItemInfo? ret;
+    for (MenuItemInfo child in children) {
+      ret = _findAndUpdateMenuItem(child, id, updatedChildren);
+      if (ret != null) {
+        break;
+      }
+    }
+    return ret;
+  }
+}
+```
+
+This function `_findAndUpdateMenuItem` receives
+the `id` of the menu item we want to update the children of
+and the `updatedChildren` list of menu items.
+The function recursively traverses the tree 
+until it finds the menu item with the `id`.
+When it does,
+it updates it and stops traversing.
+
+After execution,
+this function returns the updated menu item.
+
+This function will be *extremely* useful
+to update menu item list at any level.
+
+Let's use it!
+
+
+### 5.2.4 Updating menu items
+
+We are going to have widgets
+that will render each menu item.
+
+We are going to have two "types" of menu items:
+- **root menu items**, self-explanatory.
+- **_n-th_ level menu item**,
+which is nested from the second level upwards.
+
+*Because* we can have multiple root menu items,
+we need to create two functions to update menu items:
+
+- for *root items*,
+we simply receive the reordered root menu item list
+and update our local storage.
+- for *nested menu items*,
+we iterate over each root menu item
+and recursively try to find the `id` of the menu item
+to update its children.
+We then save the updated list to local storage.
+
+Let's implement these functions!
+
+In `settings.dart`,
+add the next two functions:
+
+```dart
+/// Updates the root menu item list [menuItems] in shared preferences.
+updateRootObjectsInPreferences(List<MenuItemInfo> menuItems) async {
+  final jsonString = json.encode(menuItems);
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(storageKey, jsonString);
+}
+
+/// Update deeply nested menu item [item] with a new [updatedChildren] in shared preferences.
+updateDeeplyNestedObjectInPreferences(MenuItemInfo itemToUpdate, List<MenuItemInfo> updatedChildren) async {
+  // Fetch the menu items from `.json` file
+  List<MenuItemInfo> menuItems = await loadMenuItems();
+
+  // Go over the root items list and find & update the object with new children
+  MenuItemInfo? updatedItem;
+  for (var item in menuItems) {
+    updatedItem = _findAndUpdateMenuItem(item, itemToUpdate.id, updatedChildren);
+    if (updatedItem != null) {
+      break;
+    }
+  }
+
+  // Saving updated menu items encoded to json string.
+  final jsonString = json.encode(menuItems);
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString(storageKey, jsonString);
+}
+```
+
+`updateRootObjectsInPreferences` receives the reordered menu item list.
+It simply saves the updated list to the local storage.
+On the other hand, `updateDeeplyNestedObjectInPreferences` 
+receives the item to update and the reordered children list.
+Inside this latter function, 
+we go over each root menu item and traverse down the tree
+to update the menu item's children. 
+After this, similarly to the previous function,
+the updated menu list item is saved to local storage.
+
+We are going to be using these handful functions *later*
+when we are rendering these menu items!
+
 
 # Star the repo! ⭐️
 
