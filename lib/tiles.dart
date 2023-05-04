@@ -4,42 +4,6 @@ import 'package:flutter/material.dart';
 
 import 'settings.dart';
 
-/// Class holding the information of the tile
-class MenuItemInfo {
-  late int id;
-  late int indexInLevel;
-  late String title;
-  late List<MenuItemInfo> tiles;
-
-  MenuItemInfo({required this.id, required this.title, this.tiles = const []});
-
-  /// Converts `json` text to BasicTile
-  MenuItemInfo.fromJson(Map<String, dynamic> json) {
-    id = json['id'];
-    indexInLevel = json['index_in_level'];
-    title = json['title'];
-    if (json['tiles'] != null) {
-      tiles = [];
-      json['tiles'].forEach((v) {
-        tiles.add(MenuItemInfo.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['index_in_level'] = indexInLevel;
-    data['title'] = title;
-    if (tiles.isNotEmpty) {
-      data['tiles'] = tiles.map((v) => v.toJson()).toList();
-    } else {
-      data['tiles'] = [];
-    }
-    return data;
-  }
-}
-
 /// Proxy decorator function that overrides the background color
 /// of the hovered menu item.
 /// See https://github.com/flutter/flutter/issues/45799.

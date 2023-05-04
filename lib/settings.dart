@@ -8,6 +8,42 @@ import 'tiles.dart';
 const jsonFilePath = 'assets/menu_items.json';
 const storageKey = 'menuItems';
 
+/// Class holding the information of the tile
+class MenuItemInfo {
+  late int id;
+  late int indexInLevel;
+  late String title;
+  late List<MenuItemInfo> tiles;
+
+  MenuItemInfo({required this.id, required this.title, this.tiles = const []});
+
+  /// Converts `json` text to BasicTile
+  MenuItemInfo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    indexInLevel = json['index_in_level'];
+    title = json['title'];
+    if (json['tiles'] != null) {
+      tiles = [];
+      json['tiles'].forEach((v) {
+        tiles.add(MenuItemInfo.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['index_in_level'] = indexInLevel;
+    data['title'] = title;
+    if (tiles.isNotEmpty) {
+      data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    } else {
+      data['tiles'] = [];
+    }
+    return data;
+  }
+}
+
 /// Loads the menu items from local storage.
 /// If none is found, it loads the menu items from `.json` file.
 /// Returns a `MenuItemInfo` menu list.
