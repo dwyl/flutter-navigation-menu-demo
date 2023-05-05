@@ -24,16 +24,16 @@ Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
 }
 
 // Widget with the list of Menu Item tiles
-class DrawerMenuTilesList extends StatefulWidget {
+class DynamicMenuTilesList extends StatefulWidget {
   final List<MenuItemInfo> menuItemInfoList;
 
-  const DrawerMenuTilesList({super.key, required this.menuItemInfoList});
+  const DynamicMenuTilesList({super.key, required this.menuItemInfoList});
 
   @override
-  State<DrawerMenuTilesList> createState() => _DrawerMenuTilesListState();
+  State<DynamicMenuTilesList> createState() => _DynamicMenuTilesListState();
 }
 
-class _DrawerMenuTilesListState extends State<DrawerMenuTilesList> {
+class _DynamicMenuTilesListState extends State<DynamicMenuTilesList> {
   late List<MenuItemInfo> menuItemInfoList;
 
   @override

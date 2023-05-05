@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'tiles.dart';
+import 'dynamic_menu.dart';
 
 const jsonFilePath = 'assets/menu_items.json';
 const storageKey = 'menuItems';

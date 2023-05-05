@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'pages.dart';
-import 'tiles.dart';
+import 'dynamic_menu.dart';
 import 'settings.dart';
 
 const drawerMenuKey = Key("drawer_menu");
@@ -129,7 +129,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                             if (snapshot.hasData) {
                               List<MenuItemInfo> menuItemInfoList = snapshot.data!;
 
-                              return DrawerMenuTilesList(key: dynamicMenuItemListKey, menuItemInfoList: menuItemInfoList);
+                              return DynamicMenuTilesList(key: dynamicMenuItemListKey, menuItemInfoList: menuItemInfoList);
                             }
 
                             // While it's not loaded (error or waiting)

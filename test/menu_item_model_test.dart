@@ -1,4 +1,4 @@
-import 'package:app/tiles.dart';
+import 'package:app/settings.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

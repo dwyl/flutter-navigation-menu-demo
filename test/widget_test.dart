@@ -1,6 +1,6 @@
 import 'package:app/menu.dart';
 import 'package:app/pages.dart';
-import 'package:app/tiles.dart';
+import 'package:app/dynamic_menu.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
