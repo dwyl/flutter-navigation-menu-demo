@@ -101,12 +101,12 @@ class MenuItem extends StatefulWidget {
 class _MenuItemState extends State<MenuItem> {
   bool _expanded = false;
 
-  late List<MenuItemInfo> menuItemInfoList;
+  late List<MenuItemInfo> childrenMenuItemInfoList;
 
   @override
   void initState() {
     super.initState();
-    menuItemInfoList = widget.info.tiles;
+    childrenMenuItemInfoList = widget.info.tiles;
   }
 
   /// Callback function that reorders the tiles
@@ -139,7 +139,7 @@ class _MenuItemState extends State<MenuItem> {
   @override
   Widget build(BuildContext context) {
     // If the tile's children is empty, we render the leaf tile
-    if (menuItemInfoList.isEmpty) {
+    if (childrenMenuItemInfoList.isEmpty) {
       return Container(
         key: widget.key,
         decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
@@ -179,7 +179,7 @@ class _MenuItemState extends State<MenuItem> {
               physics: const NeverScrollableScrollPhysics(),
               proxyDecorator: _proxyDecorator,
               onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
-              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
+              children: childrenMenuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
                 ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)),
             )
           ],
