@@ -36,10 +36,12 @@ building a navigation menu in `Flutter`.
   - [5. Adding a dynamic section to the menu](#5-adding-a-dynamic-section-to-the-menu)
     - [5.1 How the `JSON` will look like](#51-how-the-json-will-look-like)
     - [5.2 Dealing with information from the `JSON` file](#52-dealing-with-information-from-the-json-file)
-    - [5.2.1 `MenuItemInfo` class](#521-menuiteminfo-class)
-    - [5.2.2 Loading menu items from `JSON` file/local storage](#522-loading-menu-items-from-json-filelocal-storage)
-    - [5.2.3 Updating menu items](#523-updating-menu-items)
-    - [5.2.4 Updating menu items](#524-updating-menu-items)
+      - [5.2.1 `MenuItemInfo` class](#521-menuiteminfo-class)
+      - [5.2.2 Loading menu items from `JSON` file/local storage](#522-loading-menu-items-from-json-filelocal-storage)
+      - [5.2.3 Updating menu items](#523-updating-menu-items)
+      - [5.2.4 Updating menu items](#524-updating-menu-items)
+    - [5.3 Using loaded `JSON` data in menu](#53-using-loaded-json-data-in-menu)
+    - [5.4 Displaying menu items](#54-displaying-menu-items)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -146,7 +148,7 @@ checking a `Todo` item as *complete*.
 The design we're doing should 
 look like the following. 
 
-<p float="center">
+<p align="center">
   <img src="https://user-images.githubusercontent.com/17494745/219090790-e725f425-b159-4d1a-bdee-9d71c642f3b4.png" width="300" />
   <img src="https://user-images.githubusercontent.com/17494745/219090919-d5789cf0-f189-4dce-9e29-12bc1d46b67f.png" width="300" /> 
 </p>
@@ -1434,7 +1436,7 @@ that will load the information from the `JSON` file,
 save it in the device's local storage 
 and update it accordingly.
 
-### 5.2.1 `MenuItemInfo` class
+#### 5.2.1 `MenuItemInfo` class
 
 In this file we will create a class called `MenuItemInfo`.
 This is the class that will represent
@@ -1491,7 +1493,7 @@ respectively.
 Awesome! 🎉
 
 
-### 5.2.2 Loading menu items from `JSON` file/local storage
+#### 5.2.2 Loading menu items from `JSON` file/local storage
 
 Now that we have our own class,
 let's create a function to load these menu items
@@ -1553,7 +1555,7 @@ This function returns
 a list of `MenuItemInfo`.
 
 
-### 5.2.3 Updating menu items
+#### 5.2.3 Updating menu items
 
 If the user wants to reorder the menu items,
 we need to update these changes into our local storage
@@ -1632,7 +1634,7 @@ to update menu item list at any level.
 Let's use it!
 
 
-### 5.2.4 Updating menu items
+#### 5.2.4 Updating menu items
 
 We are going to have widgets
 that will render each menu item.
@@ -1700,6 +1702,212 @@ the updated menu list item is saved to local storage.
 
 We are going to be using these handful functions *later*
 when we are rendering these menu items!
+
+> e.g. [`lib/settings.dart`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/0630989f1d6f849c7f78dab0d1e8eb632299898c/lib/settings.dart)
+
+> **Note**
+>
+> We didn't create an utils class like you can do in other languages.
+> For this class to be statically accessed, 
+> it would *only have static members*.
+>
+> In Flutter, [we should avoid having classes with only static members.](https://dart-lang.github.io/linter/lints/avoid_classes_with_only_static_members.html).
+> Luckily, Dart allows functions to exist outside of classes
+> for this very reason.
+
+
+### 5.3 Using loaded `JSON` data in menu
+
+Let's call the `loadMenuItems()` function
+we've defined in `setting.dart`
+in `menu.dart`.
+Everytime the menu is opened,
+we are going to load the menu items 
+and list them accordingly
+in the drawer menu.
+
+Open `menu.dart`.
+We are going to convert the
+`DrawerMenu` class into a *stateful widget*.
+
+```dart
+class DrawerMenu extends StatefulWidget {
+  const DrawerMenu({super.key});
+
+  @override
+  State<DrawerMenu> createState() => _DrawerMenuState();
+}
+
+class _DrawerMenuState extends State<DrawerMenu> {
+  late Future<List<MenuItemInfo>> menuItems;
+
+  @override
+  void initState() {
+    super.initState();
+    menuItems = loadMenuItems();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // ...
+  }
+}
+```
+
+By converting this widget into a stateful
+widget.
+The `loadMenuitems()` function
+is used in the `initState()` overridden function
+to fetch the menu items from the `json` or local storage
+whenever the menu is mounted.
+
+These `menuItems` are going to be used in the `build()` function.
+Speaking of which, we are going to change this method now!
+
+First, let's wrap the widgets 
+inside the `body:` paramater
+with a `Column` and `Expanded` widget, 
+making it like so:
+
+```dart
+body: Column(
+        children: [
+          Expanded(
+            child: Container(
+                color: Colors.black,
+                child: ListView(key: todoTileKey, padding: const EdgeInsets.only(top: 32), children: [
+                  //...         
+                ]
+              )
+            )
+          )
+        ]
+)
+```
+
+This is needed because
+we don't know how *much height* the dynamic menu will 
+have within the drawer menu.
+Hence why we use `Expanded` to expand
+the contents as necessary.
+
+Inside the `ListView`, 
+we have an array of children where some menu items
+were created (Feature Tour, Settings).
+We are going to add the dynamic menu *below* these.
+Add the following piece of code at the end of the array.
+
+```dart
+Container(
+color: Colors.black,
+child: FutureBuilder<List<MenuItemInfo>>(
+    future: menuItems,
+    builder: (BuildContext context, AsyncSnapshot<List<MenuItemInfo>> snapshot) {
+      // If the data is correctly loaded,
+      // we render a `ReorderableListView` whose children are `MenuItem` tiles.
+      if (snapshot.hasData) {
+        List<MenuItemInfo> menuItemInfoList = snapshot.data!;
+
+        return DrawerMenuTilesList(key: dynamicMenuItemListKey, menuItemInfoList: menuItemInfoList);
+      }
+
+      // While it's not loaded (error or waiting)
+      else {
+        return const SizedBox.shrink();
+      }
+    }))
+```
+
+> e.g. [`lib/main.dart`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/0630989f1d6f849c7f78dab0d1e8eb632299898c/lib/main.dart)
+
+
+Because `loadItems()` is an *asynchronous operations*,
+we have to wait for it to conclude to properly display the menu items.
+For this, we are using the 
+[`FutureBuilder`](https://api.flutter.dev/flutter/widgets/FutureBuilder-class.html)
+class to handle the possible states
+of the `Future` class variable that `loadItems()` returns.
+
+We can generally display a loading button
+when fetching the menu items 
+(for example, it fetches the menu items from an API).
+However, to keep it simple here,
+we will only render the menu items
+if they are correctly fetched (`snapshot.hasData`).
+If not, we don't render anything.
+
+Here, we are rendering a class
+called `DynamicMenuTilesList`.
+We haven't created it yet.
+Let's do that!
+
+Inside `lib`,
+create a file called `dynamic_menu.dart`
+and create a simple class.
+
+```dart
+import 'dart:ui';
+
+import 'package:flutter/material.dart';
+
+import 'settings.dart';
+
+
+// Widget with the list of Menu Item tiles
+class DynamicMenuTilesList extends StatefulWidget {
+  final List<MenuItemInfo> menuItemInfoList;
+
+  const DynamicMenuTilesList({super.key, required this.menuItemInfoList});
+
+  @override
+  State<DynamicMenuTilesList> createState() => _DynamicMenuTilesListState();
+}
+
+class _DynamicMenuTilesListState extends State<DynamicMenuTilesList> {
+  late List<MenuItemInfo> menuItemInfoList;
+
+  @override
+  void initState() {
+    super.initState();
+    menuItemInfoList = widget.menuItemInfoList;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container();
+  }
+}
+```
+
+This class simply receives
+the list of menu items that were loaded
+from the local storage
+and uses it in its state.
+For now, let's just render a
+simple `Container` so we know the project *builds*.
+
+If we run our app,
+we should see everything still looks the same.
+After all, we're not rendering our dynamic menu items *yet*.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236423907-9eed1f7a-80d1-4b4a-8b37-be0d86b1182d.png" width="300" />
+</p>
+
+> **Note**
+>
+> We've removed the 
+> `margin: const EdgeInsets.only(top: 100),`
+> in the second container
+> of the `ListView` children array
+> just so we can see the dynamic menu better 
+> without having to scroll.
+
+
+### 5.4 Displaying menu items
+
+
+
 
 
 # Star the repo! ⭐️
