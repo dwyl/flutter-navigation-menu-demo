@@ -1375,7 +1375,7 @@ by reading contents from a `JSON` file
 and persisting it on local storage?
 
 This is what we are going to be focusing on 
-for the next sections.
+for the next section.
 
 Before this,
 let's make some preparations:
@@ -1543,12 +1543,12 @@ and update it accordingly.
 With this in mind,
 in the beginning of this function
 we check if there is any 
-`json` string in the device's local storage.
+`JSON` string in the device's local storage.
 
-If **the `json` string is saved into our local storage**,
+If **the `JSON` string is saved into our local storage**,
 we simply use it to later decode it
 into a list of `MenuItemInfo` (class we've created previously).
-If **the `json` string is not saved into our local storage**,
+If **the `JSON` string is not saved into our local storage**,
 we fetch it from the `assets/menu_items.json` file
 and then later decode it in a similar fashion.
 
@@ -1561,7 +1561,7 @@ a list of `MenuItemInfo`.
 If the person wants to reorder the menu items,
 we need to update these changes into our local storage
 so it's always up-to-date and reflects the true state
-of the list of menu items.
+of the list.
 
 When a person reorders a menu item in any level except the root,
 we update the `tiles` list field (which pertains to the children menu items)
@@ -1699,7 +1699,7 @@ Inside this latter function,
 we go over each root menu item and traverse down the tree
 to update the menu item's children. 
 After this, similarly to the previous function,
-the updated menu list item is saved to local storage.
+the updated menu item list is saved to local storage.
 
 We are going to be using these handful functions *later*
 when we are rendering these menu items!
@@ -1720,7 +1720,7 @@ when we are rendering these menu items!
 ### 5.3 Using loaded `JSON` data in menu
 
 Let's call the `loadMenuItems()` function
-we've defined in `setting.dart`
+we've defined in `settings.dart`
 in `menu.dart`.
 Everytime the menu is opened,
 we are going to load the menu items 
@@ -1933,13 +1933,13 @@ and change it like so:
 We are rendering a 
 [`ReorderableListView`](https://api.flutter.dev/flutter/material/ReorderableListView-class.html)
 which, in turn,
-render a list of `MenuItem`s
+renders a list of `MenuItem`s
 (don't worry, we'll create this class right away).
 
 Since `DynamicMenuTilesList` receives a list
 of `MenuItemInfo`, 
 we use `indexInLevel` to sort it by the index
-that is defined in the `json` file/local storage.
+that is defined in the `JSON` file/local storage.
 
 Essentially, 
 `DynamicMenuTilesList` 
@@ -2095,7 +2095,6 @@ is a `MenuItem` that can either be an `ExpansionTile`
 or a `ListTile` 
 (which refers to a "leaf node", an item that has no children).
 
-Awesome!
 Let's run the app.
 We should be able to see our dynamic menu
 and expand each menu item!
