@@ -42,6 +42,7 @@ building a navigation menu in `Flutter`.
       - [5.2.4 Updating menu items](#524-updating-menu-items)
     - [5.3 Using loaded `JSON` data in menu](#53-using-loaded-json-data-in-menu)
     - [5.4 Displaying menu items](#54-displaying-menu-items)
+    - [5.5 Reordering items](#55-reordering-items)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -161,7 +162,7 @@ Regardless, the following constraints ought to be considered:
 - we will adopt a 
 [**Progressive UI**](https://github.com/dwyl/product-roadmap/issues/43)
 approach,
-where the user will only
+where the person will only
 be shown the option to open the menu
 *after doing a specific action*
 (in this case, completing a simple
@@ -427,7 +428,7 @@ After this,
 we are going to be adding
 a `showMenu` variable in `_HomePageState`,
 a flag that will let us know if we should show 
-the option for the user to open the menu.
+the option for the person to open the menu.
 
 ```dart
 class _HomePageState extends State<HomePage> {
@@ -620,7 +621,7 @@ Let's do it!
 
 In the wireframe, 
 the menu currently has three items
-that the user can click
+that the person can click
 to navigate into the referring page:
 - the **Todo List**
 - the **Feature Tour** page
@@ -711,7 +712,7 @@ class SettingsPage extends StatelessWidget {
 
 Both pages are very similar.
 They have some text
-and a button that will allow the user
+and a button that will allow the person
 to **navigate back**. 
 
 These pages will be later used
@@ -770,7 +771,7 @@ add this key to the
 
 We've also disabled `drawerEnableOpenDragGesture`,
 so the `Drawer` isn't opened with the right-to-left gesture,
-so the user *has* to click the button to open the menu.
+so the person *has* to click the button to open the menu.
 
 In the `IconButton`, 
 in the `actions` attribute of the `Scaffold`,
@@ -921,7 +922,7 @@ The menu is essentially consisted of an
 `AppBar` and `ListView`,
 with many `ListTile` children,
 each one pertaining to the different page
-the user can navigate into.
+the person can navigate into.
 
 The `AppBar` is similar to the one
 found in the `_HomePageState` class.
@@ -1557,12 +1558,12 @@ a list of `MenuItemInfo`.
 
 #### 5.2.3 Updating menu items
 
-If the user wants to reorder the menu items,
+If the person wants to reorder the menu items,
 we need to update these changes into our local storage
 so it's always up-to-date and reflects the true state
 of the list of menu items.
 
-When a user reorders a menu item in any level except the root,
+When a person reorders a menu item in any level except the root,
 we update the `tiles` list field (which pertains to the children menu items)
 of the parent.
 
@@ -1906,9 +1907,442 @@ After all, we're not rendering our dynamic menu items *yet*.
 
 ### 5.4 Displaying menu items
 
+Now let's get to the bread and butter
+of this whole section:
+*dispaying our menu items*.
+
+In `lib/dynamic_menu.dart`,
+locate the `build()` function
+in the `_DynamicMenuTilesListState` class
+and change it like so:
+
+```dart
+  Widget build(BuildContext context) {
+    return ReorderableListView(
+        padding: const EdgeInsets.only(top: 32),
+        onReorder: (oldIndex, newIndex) {},
+        children: menuItemInfoList
+            .map(
+              (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
+            )
+            .toList()
+          ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)));
+  }
+```
+
+We are rendering a 
+[`ReorderableListView`](https://api.flutter.dev/flutter/material/ReorderableListView-class.html)
+which, in turn,
+render a list of `MenuItem`s
+(don't worry, we'll create this class right away).
+
+Since `DynamicMenuTilesList` receives a list
+of `MenuItemInfo`, 
+we use `indexInLevel` to sort it by the index
+that is defined in the `json` file/local storage.
+
+Essentially, 
+`DynamicMenuTilesList` 
+**is rendering the root menu items**.
+Nested menu items will be rendered 
+in the `MenuItem` class.
+
+This `MenuItem` class
+receives a `key` 
+and the `MenuItemInfo` object.
+
+Let's create `MenuItem` right now!
+
+In the same file,
+create the stateful widget `MenuItem`.
+
+```dart
+/// Widget that expands if there are child tiles or not.
+class MenuItem extends StatefulWidget {
+  final Key key;
+  final MenuItemInfo info;
+  final double leftPadding;
+
+  const MenuItem({required this.key, required this.info, this.leftPadding = 16}) : super(key: key);
+
+  @override
+  State<MenuItem> createState() => _MenuItemState();
+}
+
+class _MenuItemState extends State<MenuItem> {
+  bool _expanded = false;
+
+  late List<MenuItemInfo> menuItemInfoList;
+
+  @override
+  void initState() {
+    super.initState();
+    menuItemInfoList = widget.info.tiles;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // If the tile's children is empty, we render the leaf tile
+    if (menuItemInfoList.isEmpty) {
+      return Container(
+        key: widget.key,
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+        child: ListTile(
+            contentPadding: EdgeInsets.only(left: widget.leftPadding),
+            title: Text(widget.info.title,
+                style: const TextStyle(
+                  fontSize: 25,
+                  color: Colors.white,
+                ))),
+      );
+    }
+
+    // If the tile has children, we render this as an expandable tile.
+    else {
+      return Container(
+        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+
+        // Rendering `ExpansionTile` which expands to render the children.
+        // The children are rendered in a `ReorderableListView`
+        // so they can be reordered on the same level.
+        child: ExpansionTile(
+          tilePadding: EdgeInsets.only(left: widget.leftPadding),
+          title: Text(widget.info.title,
+              style: const TextStyle(
+                fontSize: 25,
+                color: Colors.white,
+              )),
+          trailing: Icon(
+            _expanded ? Icons.expand_less : Icons.arrow_drop_down,
+            color: Colors.white,
+          ),
+          children: [
+            ReorderableListView(
+              shrinkWrap: true,
+              onReorder: (oldIndex, newIndex) {},
+              children: menuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
+                ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)),
+            )
+          ],
+          onExpansionChanged: (bool expanded) {
+            setState(() => _expanded = expanded);
+          },
+        ),
+      );
+    }
+  }
+}
+```
+
+Phew! 😅
+That's a lot to unpack!
+
+The reason `MenuItem` is receiving a 
+[`Key`](https://api.flutter.dev/flutter/foundation/Key-class.html)
+is because `ReorderableListView` 
+*needs it for when the person is reordering items*.
+If you want to learn more about why,
+please read 
+https://stackoverflow.com/questions/59444423/reorderablelistview-does-not-identify-keys-in-custom-widget.
+
+> **Note**
+>
+> We're going to implement reordering items
+> in the next section!
+
+Additionally,
+the `leftPadding` field is used
+to add padding in nested menu items.
+
+In the State class, 
+we have two fields:
+- `_expanded`, 
+a boolean pertaining to whether the menu item
+is expanded or not.
+- `childrenMenuItemInfoList`,
+pertaining to the list of children menu items
+of the given menu item.
+This list can be empty.
+
+Since `childrenMenuItemInfoList` can be empty,
+we need to conditionally render a menu item accordingly.
+**If it's empty**, we simply render 
+a `ListTile` with the title of the menu.
+**If it's not empty**,
+we render an `ExpansionTile` that can be expanded or not
+(hence why we use the `_expanded` boolean variable)
+wrapped around a `ReorderableListView`
+that lists `MenuItems`.
+
+This is a recursive behaviour.
+We are rendering `MenuItems` 
+that serve as an `ExpansionTile`
+or simple `ListTile`.
+
+Take the following image.
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236449880-931eb725-7704-46b5-905d-3391a40ed9fa.png" width="300" />
+</p>
 
 
+Every <span style="color: orange">orange box</span>
+is a **root menu item**
+that are rendered in the `DynamicMenuTilesList` class.
+Each <span style="color: blue">blue box</span>
+is a `MenuItem` that can either be an `ExpansionTile`
+(which renders a list of `MenuItems` in itself)
+or a `ListTile` 
+(which refers to a "leaf node", an item that has no children).
 
+Awesome!
+Let's run the app.
+We should be able to see our dynamic menu
+and expand each menu item!
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236452865-a14ae583-d244-4f82-bd7e-8e6542654110.gif" width="300" />
+</p>
+
+
+Awesome! 🎉
+
+### 5.5 Reordering items
+
+Because we are using `ReorderableListView` 
+to render our lists of (nested or not) menu items,
+we should be able to allow the people using the app
+to reorder the items!
+
+Open `_DynamicMenuTilesListState`
+and locate the `build()` function.
+Change it to the following:
+
+```dart
+Widget build(BuildContext context) {
+  return ReorderableListView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.only(top: 32),
+      onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, menuItemInfoList),
+      children: menuItemInfoList
+          .map(
+            (tile) => MenuItem(key: ValueKey(tile.id), info: tile),
+          )
+          .toList()
+        ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)));
+}
+```
+
+Because we're adding nested `ReorderableListView`s
+inside `ReorderableListView`s,
+for reordering to properly work on menu items
+*on the same level*,
+we need to add `physics: const NeverScrollableScrollPhysics()`.
+For more information, visit
+https://stackoverflow.com/questions/56726298/nesting-reorderable-lists.
+
+In `ReorderableListView`, when the user *long presses the menu item*
+and drags it,
+the `onReorder` callback function is invoked.
+We are calling a function called 
+`_reorderTiles`, which is not yet implemented.
+Let's do that!
+
+In the same class...
+
+```dart
+  void _reorderTiles(int oldIndex, int newIndex, List<MenuItemInfo> menuItemInfoList) {
+    // an adjustment is needed when moving the tile down the list
+    if (oldIndex < newIndex) {
+      newIndex--;
+    }
+
+    // get the tile we are moving
+    final tile = menuItemInfoList.removeAt(oldIndex);
+
+    // place the tile in the new position
+    menuItemInfoList.insert(newIndex, tile);
+
+    // update the `indexInLevel` field of each item to be in order
+    menuItemInfoList.asMap().forEach((index, value) => value.indexInLevel = index);
+
+    // Update state
+    setState(() {
+      menuItemInfoList = menuItemInfoList;
+    });
+
+    // update the menu item object with updated children in the `json` file.
+    updateRootObjectsInPreferences(menuItemInfoList);
+  }
+```
+
+The callback receives the `oldIndex` and the `newIndex`
+of the menu item being changed.
+If you want to understand how the reordering happens,
+no better than this 4-minute explanation
+on https://youtu.be/wwUR7841Ajs?t=292.
+
+What's important to understand here
+is that the `indexInLevel` field 
+of the menu item's children
+are updated to match the person's reordering
+and then it's updated
+on the user preferences
+by calling `updateRootObjectsInPreferences`.
+The latter function
+*receives the updated menu items*.
+**Remember we're dealing with root menu items**,
+so we just *pass* the updated dynamic list.
+
+We are going to repeat this process in the `MenuItem` class.
+Scroll to `MenuItem`,
+locate the `build()` function
+and find the `ReorderableListView`.
+
+```dart
+// ....
+children: [
+  ReorderableListView(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
+    children: childrenMenuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
+      ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)),
+  )
+],
+```
+
+Similarly to before, 
+we've added the `physics` parameter
+and referenced a function on `onReorder`,
+which we will need to implement.
+In the same class,
+add `_reorderTiles`.
+
+```dart
+  void _reorderTiles(int oldIndex, int newIndex, MenuItemInfo menuItemInfo) {
+    List<MenuItemInfo> menuItemInfoList = menuItemInfo.tiles;
+
+    // an adjustment is needed when moving the tile down the list
+    if (oldIndex < newIndex) {
+      newIndex--;
+    }
+
+    // get the tile we are moving
+    final tile = menuItemInfoList.removeAt(oldIndex);
+
+    // place the tile in the new position
+    menuItemInfoList.insert(newIndex, tile);
+
+    // update the `indexInLevel` field of each item to be in order
+    menuItemInfoList.asMap().forEach((index, value) => value.indexInLevel = index);
+
+    // Update state
+    setState(() {
+      menuItemInfoList = menuItemInfoList;
+    });
+
+    // update the menu item object with updated children in the `json` file.
+    updateDeeplyNestedObjectInPreferences(menuItemInfo, menuItemInfoList);
+  }
+```
+
+As you can see,
+it's *extremely similar*
+to the function we've written in the 
+`DynamicMenuTilesList` class.
+The *only difference* is that
+we are calling `updateDeeplyNestedObjectInPreferences`,
+which we've created previously.
+
+This reordering happens at
+menu items that are **nested**.
+
+Now let's see what these changes
+led us to!
+Run the app and you should be able to reorder
+menu items by *long pressing* and *dragging*
+them on the same level.
+And because we are calling the functions
+to update the local storage,
+these updates are *persisted*
+whenever the person closes and reopens the drawer menu! 🥳
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236476121-3ba48275-93b6-4979-af19-f274232500f2.gif" width="300" />
+</p>
+
+Hurray! 
+Everything seems to be working.
+Let's tweak just *one more thing*:
+the background color when the person performs the drag over.
+For this, 
+we need to override the 
+[`proxyDecorator`](https://api.flutter.dev/flutter/material/ReorderableListView/proxyDecorator.html)
+parameter of the `ReorderableListView`.
+
+In the same file `lib/dynamic_menu.dart`,
+outside the classes we've created,
+create this function:
+
+```dart
+Widget _proxyDecorator(Widget child, int index, Animation<double> animation) {
+  return AnimatedBuilder(
+    animation: animation,
+    builder: (BuildContext context, Widget? child) {
+      final double animValue = Curves.easeInOut.transform(animation.value);
+      final double elevation = lerpDouble(0, 6, animValue)!;
+      return Material(
+        elevation: elevation,
+        color: const Color.fromARGB(255, 76, 76, 76),
+        child: child,
+      );
+    },
+    child: child,
+  );
+}
+```
+
+> **Note**
+>
+> For more information about this,
+> please visit https://github.com/flutter/flutter/issues/45799.
+
+We're keeping the default settings,
+just changing the `color` to a dark gray.
+
+Now we only need to use this function
+inside each `ReorderableListView`
+in both `DynamicMenuTilesList` and `MenuItem` classes!
+
+```dart
+  ReorderableListView(
+    proxyDecorator: _proxyDecorator, // add this line to both
+    physics: const NeverScrollableScrollPhysics(),
+    onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
+    //...
+  )
+```
+
+Your file should look like
+[`lib/dynamic_menu.dart`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/2e48da8542ebc9c545b5f7b81ff04897acd944ea/lib/dynamic_menu.dart).
+
+And we're through!
+If we run the app,
+you'll verify that the background of the menu item
+when dragged is different!
+
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236480042-4a369c3f-0c1d-4aee-b029-181f3e953cfd.gif" width="300" />
+</p>
+
+
+And we're done!
+We've successfully added a dynamic menu 
+to our app!
+Give yourself a pat on the back! 👏
 
 # Star the repo! ⭐️
 
