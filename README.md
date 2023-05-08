@@ -43,6 +43,7 @@ building a navigation menu in `Flutter`.
     - [5.3 Using loaded `JSON` data in menu](#53-using-loaded-json-data-in-menu)
     - [5.4 Displaying menu items](#54-displaying-menu-items)
     - [5.5 Reordering items](#55-reordering-items)
+    - [5.6 Adding text customization](#56-adding-text-customization)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -2342,6 +2343,178 @@ And we're done!
 We've successfully added a dynamic menu 
 to our app!
 Give yourself a pat on the back! 👏
+
+
+### 5.6 Adding text customization 
+
+Let's add further customization to our dynamic menu.
+This process can be applied to other types of customization
+pertaining to each menu item.
+
+In this small section,
+we will focus on 
+*adding different text colour to each menu item.*
+
+We need to first add this information to the `JSON` file.
+For each object,
+add a field called `"text_color"`:
+
+```json
+  {
+    "id": 1,
+    "index_in_level": 0,
+    "title": "People",
+    "text_color": "#Ffb97e",  // add this line
+    "tiles": []
+  }
+```
+
+> [`assets/menu_items.json`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/e536a8d4dc22c324a3c594350e6a9decdbecefbc/assets/menu_items.json)
+
+This field has an 
+[hex triplet string](https://en.wikipedia.org/wiki/Web_colors#Hex_triplet)
+pertaining to a color.
+
+We now need to parse this information
+into our `MenuItemInfo` class.
+For this, open `lib/settings.dart`
+and make the following changes:
+
+```dart
+class MenuItemInfo {
+  late int id;
+  late int indexInLevel;
+  late String title;
+  late Color textColor;   // add this line
+  late List<MenuItemInfo> tiles;
+
+  MenuItemInfo({required this.id, required this.title, this.tiles = const []});
+
+  MenuItemInfo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    indexInLevel = json['index_in_level'];
+    title = json['title'];
+    textColor = hexToColor(json['text_color']);  // add this line
+    if (json['tiles'] != null) {
+      tiles = [];
+      json['tiles'].forEach((v) {
+        tiles.add(MenuItemInfo.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['index_in_level'] = indexInLevel;
+    data['title'] = title;
+    data['text_color'] = '#${textColor.value.toRadixString(16)}';  // add this line
+    if (tiles.isNotEmpty) {
+      data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    } else {
+      data['tiles'] = [];
+    }
+    return data;
+  }
+}
+```
+
+Here we are making use of two functions:
+
+- when importing information from `JSON` file,
+we use `hexToColor`.
+We will implement this function to convert the hex string
+to a [`Colors`](https://api.flutter.dev/flutter/material/Colors-class.html)
+class.
+- when encoding the class into a `JSON` format,
+we convert the `Color` to a an hex string
+by using the `toRadixString` function.
+For more information,
+check https://stackoverflow.com/questions/55147586/flutter-convert-color-to-hex-string.
+
+Let's implement `hexToColor`.
+In the same file,
+add this function.
+
+```dart
+Color hexToColor(String hexString) {
+  try {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  } catch (e) {
+    return const Color(0xFFFFFFFF);
+  }
+```
+
+This will receive a string
+and try to convert to a `Color` object.
+If it fails (whether because the string 
+is empty or invalid),
+we default to *the color white*.
+
+All that's left is to 
+*use* this new field of the `MenuItemInfo`
+in our widget that renders the menu items!
+
+For this, open `lib/dynamic_menu.dart`
+and locate `ListTile` in both widgets
+that render the menu item.
+Change the for the following:
+
+```dart
+style: TextStyle(
+  fontSize: 25,
+  color: widget.info.textColor,
+))),
+```
+
+We are thus using the `widget.info` item menu class
+we've changed earlier to render the
+converted `textColor` (which is a `Color` object).
+
+> Check 
+> [`e536a8d`](https://github.com/dwyl/flutter-navigation-menu-demo/pull/5/commits/e536a8d4dc22c324a3c594350e6a9decdbecefbc)
+> for the needed changes.
+
+If you run the app now,
+nothing seems to change.
+**This is because we are fetching the information from the local storage**.
+The changes we've made to `assets/menu_items.json`
+aren't saved because we have our local storage with the previous `JSON` state.
+
+To fix this,
+we simply need to add one line to 
+`loadMenuItems()` function in `lib/settings.dart`.
+Add it like so:
+
+```dart
+Future<List<MenuItemInfo>> loadMenuItems() async {
+  final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+  await prefs.remove(storageKey); // add this line
+}
+```
+
+This will **remove the local storage content**
+and *force* the app to fetch the information from the `JSON` file.
+Run this one time and comment the line again.
+This is important, **you need to comment the line again**.
+Or else the tests will fail and your menu will always reset
+to the contents of the `JSON` file 
+and *ignore* your drag and drop actions.
+
+And that's it!
+If you run the app,
+you should see the titles of the menu item changing!
+
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/17494745/236856745-64fff4e7-eff3-41ff-94fc-7800ddcb6210.png" width="300" />
+</p>
+
+
 
 # Star the repo! ⭐️
 
