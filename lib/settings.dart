@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,11 +9,25 @@ import 'dynamic_menu.dart';
 const jsonFilePath = 'assets/menu_items.json';
 const storageKey = 'menuItems';
 
+/// Converts a [hexString] to a Color.
+/// Color white is returned by default.
+Color hexToColor(String hexString) {
+  try {
+    final buffer = StringBuffer();
+    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+    buffer.write(hexString.replaceFirst('#', ''));
+    return Color(int.parse(buffer.toString(), radix: 16));
+  } catch (e) {
+    return const Color(0xFFFFFFFF);
+  }
+}
+
 /// Class holding the information of the tile
 class MenuItemInfo {
   late int id;
   late int indexInLevel;
   late String title;
+  late Color textColor;
   late List<MenuItemInfo> tiles;
 
   MenuItemInfo({required this.id, required this.title, this.tiles = const []});
@@ -22,6 +37,7 @@ class MenuItemInfo {
     id = json['id'];
     indexInLevel = json['index_in_level'];
     title = json['title'];
+    textColor = hexToColor(json['text_color']);
     if (json['tiles'] != null) {
       tiles = [];
       json['tiles'].forEach((v) {
@@ -35,6 +51,7 @@ class MenuItemInfo {
     data['id'] = id;
     data['index_in_level'] = indexInLevel;
     data['title'] = title;
+    data['text_color'] = '#${textColor.value.toRadixString(16)}';
     if (tiles.isNotEmpty) {
       data['tiles'] = tiles.map((v) => v.toJson()).toList();
     } else {
@@ -50,7 +67,7 @@ class MenuItemInfo {
 Future<List<MenuItemInfo>> loadMenuItems() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  //await prefs.remove(storageKey);
+  await prefs.remove(storageKey);
 
   final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
 

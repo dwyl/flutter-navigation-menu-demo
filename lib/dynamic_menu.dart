@@ -146,9 +146,9 @@ class _MenuItemState extends State<MenuItem> {
         child: ListTile(
             contentPadding: EdgeInsets.only(left: widget.leftPadding),
             title: Text(widget.info.title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 25,
-                  color: Colors.white,
+                  color: widget.info.textColor,
                 ))),
       );
     }
@@ -164,9 +164,9 @@ class _MenuItemState extends State<MenuItem> {
         child: ExpansionTile(
           tilePadding: EdgeInsets.only(left: widget.leftPadding),
           title: Text(widget.info.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 25,
-                color: Colors.white,
+                color: widget.info.textColor,
               )),
           trailing: Icon(
             _expanded ? Icons.expand_less : Icons.arrow_drop_down,

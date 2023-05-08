@@ -3,33 +3,39 @@
     "id": 1,
     "index_in_level": 0,
     "title": "People",
+    "text_color": "#Ffb97e",
     "tiles": [
       {
         "id": 2,
         "index_in_level": 0,
         "title": "Online Now",
+        "text_color": "#FFFFFF",
         "tiles": [
           {
             "id": 3,
             "index_in_level": 0,
             "title": "Family",
+            "text_color": "#FFFFFF",
             "tiles": []
           },
           {
             "id": 4,
             "index_in_level": 1,
             "title": "Friends",
+            "text_color": "#FFFFFF",
             "tiles": [
               {
                 "id": 5,
                 "index_in_level": 0,
                 "title": "Sports Team",
+                "text_color": "#FFFFFF",
                 "tiles": []
               },
               {
                 "id": 6,
                 "index_in_level": 1,
                 "title": "Gamerz",
+                "text_color": "#FFFFFF",
                 "tiles": []
               }
             ]
@@ -38,6 +44,7 @@
             "id": 7,
             "index_in_level": 2,
             "title": "Work",
+            "text_color": "#FFFFFF",
             "tiles": []
           }
         ]
@@ -46,6 +53,7 @@
         "id": 8,
         "index_in_level": 1,
         "title": "Everyone",
+        "text_color": "#FFFFFF",
         "tiles": []
       }
     ]
@@ -54,6 +62,7 @@
     "id": 9,
     "index_in_level": 1,
     "title": "Potaro",
+    "text_color": "#0baedc",
     "tiles": []
   }
 ]
