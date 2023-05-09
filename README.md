@@ -44,6 +44,7 @@ building a navigation menu in `Flutter`.
     - [5.4 Displaying menu items](#54-displaying-menu-items)
     - [5.5 Reordering items](#55-reordering-items)
     - [5.6 Adding text customization](#56-adding-text-customization)
+    - [5.7 Adding icons to menu items](#57-adding-icons-to-menu-items)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -2446,6 +2447,7 @@ Color hexToColor(String hexString) {
   } catch (e) {
     return const Color(0xFFFFFFFF);
   }
+}
 ```
 
 This will receive a string
@@ -2515,6 +2517,237 @@ you should see the titles of the menu item changing!
 </p>
 
 
+### 5.7 Adding icons to menu items
+
+Similarly to what we've done before,
+let's allow the person to customize the icon for each menu item.
+We are expecting this feature to allow support for:
+- `emoji`.
+- `icons`.
+- `images` (up to `64x64px` size).
+
+For this, we are going go need to pass this information
+in the `JSON` file `assets/menu_items.json`.
+
+```json
+{
+  "id": 1,
+  "index_in_level": 0,
+  "title": "People",
+  "text_color": "#Ffb97e",
+
+  // This section is added 
+  "icon": {
+    "colour": "#Ffb97e",
+    "code": 61668,
+    "emoji": "🧑‍🤝‍🧑",
+    "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+  },
+}
+```
+
+We are adding an `"icon"` field
+that has four parameters:
+- a `colour` field, pertaining to an hex colour code.
+If this field is missing or invalid,
+it defaults to a *white colour*.
+- a `code`, referring to an int 
+pertaining the `material icon` class.
+You can find each code in 
+https://api.flutter.dev/flutter/material/Icons-class.html#constants.
+- an `emoji` in string format.
+- an image `url`, 
+that is downscaled automatically to `64 x 64px`.
+
+> e.g. [`assets/menu_items.json`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/081a7eae7c92e1b1eea28514c194cdf4d7072c6b/assets/menu_items.json)
+
+We are going to need a class in `Dart`
+so we can use this new information.
+In `lib/settings.dart`, create the following class.
+
+```dart
+class MenuItemInfoIcon {
+  late final int? code;
+  late final String? emoji;
+  late final String? url;
+  late final String? colour;
+
+  MenuItemInfoIcon({this.code, this.emoji, this.url, this.colour});
+
+  MenuItemInfoIcon.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+    emoji = json['emoji'];
+    url = json['url'];
+    colour = json['colour'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['emoji'] = emoji;
+    data['url'] = url;
+    data['colour'] = colour;
+
+    return data;
+  }
+}
+```
+
+This is a simple class with each field that we've explained earlier.
+Now let's *add* a field in `MenuItemInfo`
+with this new class. 
+In the same file `lib/settings.dart`,
+change `MenuItem` so it looks like so:
+
+```dart
+class MenuItemInfo {
+  late int id;
+  late int indexInLevel;
+  late String title;
+  late Color textColor;
+  late MenuItemInfoIcon? _icon;
+  late List<MenuItemInfo> tiles;
+
+  MenuItemInfo({required this.id, required this.title, this.tiles = const []});
+
+  /// We've migrated the `hexToColor` function to here...
+  Color _hexToColor(String hexString) {
+    try {
+      final buffer = StringBuffer();
+      if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+      buffer.write(hexString.replaceFirst('#', ''));
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } catch (e) {
+      return const Color(0xFFFFFFFF);
+    }
+  }
+
+  Widget? getIcon() {
+    bool iconExists = _icon != null;
+
+    // Check if any icon information exists
+    if (iconExists) {
+
+      // Icon parameters
+      int? iconCode = _icon?.code;
+      String? emojiText = _icon?.emoji;
+      String? imageUrl = _icon?.url;
+      String? colourHex = _icon?.colour;
+
+      // Icon colour
+      Color colour = _hexToColor(colourHex!);
+
+      if (iconCode != null) {
+        return Icon(
+          IconData(iconCode, fontFamily: 'MaterialIcons'),
+          color: colour,
+        );
+      }
+
+      if (emojiText != null) {
+        return Text(emojiText.toString(), style: TextStyle(color: colour, fontSize: 30));
+      }
+
+      if(imageUrl != null) {
+        return Container(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Image.network(imageUrl, fit: BoxFit.fitHeight, height: 64));
+      }
+    } 
+    
+    // If there's no icon information, return null
+    else {
+      return null;
+    }
+  }
+
+
+  MenuItemInfo.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    indexInLevel = json['index_in_level'];
+    title = json['title'];
+    textColor = _hexToColor(json['text_color']);
+    if (json['tiles'] != null) {
+      tiles = [];
+      json['tiles'].forEach((v) {
+        tiles.add(MenuItemInfo.fromJson(v));
+      });
+    }
+
+    // Add these new liens
+    _icon = null;
+    if (json['icon'] != null) {
+      _icon = MenuItemInfoIcon.fromJson(json['icon']);
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    data['index_in_level'] = indexInLevel;
+    data['title'] = title;
+    data['text_color'] = '#${textColor.value.toRadixString(16)}';
+    if (tiles.isNotEmpty) {
+      data['tiles'] = tiles.map((v) => v.toJson()).toList();
+    } else {
+      data['tiles'] = [];
+    }
+
+    // Add these new lines 
+    if (_icon != null) {
+      data['icon'] = _icon!.toJson();
+    }
+
+    return data;
+  }
+}
+```
+
+We've made a few changes to this class:
+- we've first migrated the `hexToColour` function
+to be a *private function* inside `MenuItemInfo` class.
+- added an `_icon` field with type `menuItemInfoIcon` 
+(class we've just defined).
+- in the `MenuItemInfo.fromJson()` function,
+we've added lines to parse the `icon` field from the `JSON` file.
+- in the `MenuItemInfo.toJson()` function,
+we've added lines to encode the `_icon` field into the `JSON` file.
+- added a `getIcon()` function that,
+depending on the fields that are present in the `icon` object,
+will render a referring widget.
+Ordering by priority, the `icon` will take precedence over
+the `emoji` and the latter from the image `url`.
+The `colour` field will change the `icon` colour, 
+if there's any.
+If none of these fields are found, 
+nothing is rendered.
+
+The `getIcon()` function will be used in the widgets
+in `lib/dynamic_menu.dart`.
+In the `_MenuItemState` class,
+add `leadileading: widget.info.getIcon(),`
+to the `Container`s.
+
+> See the changes in [081a7ea](https://github.com/dwyl/flutter-navigation-menu-demo/pull/5/commits/081a7eae7c92e1b1eea28514c194cdf4d7072c6b).
+
+And you should be done!
+If you run the application,
+you will see that we can now add icons
+to the menu items!
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/aedf5432-08c6-4505-b34f-9b5e5ae0513f" width="300" />
+</p>
+
+Great job! 🥳
+
+> **Note**
+>
+> Similarly to what we've done in the previous section,
+> you need to clear the local storage to get the
+> most up-to-date `JSON` file contents.
+>
+> Use `await prefs.remove(storageKey);` for this.
 
 # Star the repo! ⭐️
 
