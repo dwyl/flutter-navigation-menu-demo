@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/main.dart';
+import 'package:network_image_mock/network_image_mock.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -275,43 +276,48 @@ void main() {
     });
 
     testWidgets('Drag and drop nested elements on third level', (WidgetTester tester) async {
-      // Initialize app
-      await tester.pumpWidget(const App());
 
-      final menuButton = find.byKey(iconKey);
-      final todoItem = find.byKey(todoItemKey);
+      // To mock the icons fetching images from Network.
+      // See https://github.com/stelynx/network_image_mock.
+      mockNetworkImagesFor(() async {
+        // Initialize app
+        await tester.pumpWidget(const App());
 
-      // Tap on todo item
-      await tester.tap(todoItem);
-      await tester.pumpAndSettle();
+        final menuButton = find.byKey(iconKey);
+        final todoItem = find.byKey(todoItemKey);
 
-      // Tap menu icon
-      await tester.tap(menuButton);
-      await tester.pumpAndSettle();
+        // Tap on todo item
+        await tester.tap(todoItem);
+        await tester.pumpAndSettle();
 
-      // First menu and submenu item from `.json` file
-      final peopleMenuItem = find.text("People");
+        // Tap menu icon
+        await tester.tap(menuButton);
+        await tester.pumpAndSettle();
 
-      // Tap on "people" menu item
-      await tester.tap(peopleMenuItem);
-      await tester.pumpAndSettle();
+        // First menu and submenu item from `.json` file
+        final peopleMenuItem = find.text("People");
 
-      final onlineMenuItem = find.text("Online Now", skipOffstage: false);
+        // Tap on "people" menu item
+        await tester.tap(peopleMenuItem);
+        await tester.pumpAndSettle();
 
-      // Tap on "Online Now" menu item
-      await tester.tap(onlineMenuItem);
-      await tester.pumpAndSettle();
+        final onlineMenuItem = find.text("Online Now", skipOffstage: false);
 
-      final friendsMenuItem = find.text("Friends", skipOffstage: false);
-      final workMenuItem = find.text("Work", skipOffstage: false);
+        // Tap on "Online Now" menu item
+        await tester.tap(onlineMenuItem);
+        await tester.pumpAndSettle();
 
-      // Switching "Online Now" and "Everyone"
-      await longPressDrag(
-        tester,
-        tester.getCenter(friendsMenuItem),
-        tester.getCenter(workMenuItem) + const Offset(0.0, itemHeight * 2),
-      );
-      await tester.pumpAndSettle();
+        final friendsMenuItem = find.text("Friends", skipOffstage: false);
+        final workMenuItem = find.text("Work", skipOffstage: false);
+
+        // Switching "Online Now" and "Everyone"
+        await longPressDrag(
+          tester,
+          tester.getCenter(friendsMenuItem),
+          tester.getCenter(workMenuItem) + const Offset(0.0, itemHeight * 2),
+        );
+        await tester.pumpAndSettle();
+      });
     });
 
     testWidgets('Drag and drop root elements', (WidgetTester tester) async {
