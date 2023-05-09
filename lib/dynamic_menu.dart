@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import 'app_localization.dart';
 import 'settings.dart';
 
 /// Proxy decorator function that overrides the background color
@@ -146,7 +147,7 @@ class _MenuItemState extends State<MenuItem> {
         child: ListTile(
             contentPadding: EdgeInsets.only(left: widget.leftPadding),
             leading: widget.info.getIcon(),
-            title: Text(widget.info.title,
+            title: Text(AppLocalization.of(context).getMenuItemTitle(widget.info),
                 style: TextStyle(
                   fontSize: 25,
                   color: widget.info.textColor,
@@ -164,7 +165,7 @@ class _MenuItemState extends State<MenuItem> {
         // so they can be reordered on the same level.
         child: ExpansionTile(
           tilePadding: EdgeInsets.only(left: widget.leftPadding),
-          title: Text(widget.info.title,
+            title: Text(AppLocalization.of(context).getMenuItemTitle(widget.info),
               style: TextStyle(
                 fontSize: 25,
                 color: widget.info.textColor,
