@@ -4,21 +4,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'dynamic_menu.dart';
-
 const jsonFilePath = 'assets/menu_items.json';
 const storageKey = 'menuItems';
 
-/// Converts a [hexString] to a Color.
-/// Color white is returned by default.
-Color hexToColor(String hexString) {
-  try {
-    final buffer = StringBuffer();
-    if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
-    buffer.write(hexString.replaceFirst('#', ''));
-    return Color(int.parse(buffer.toString(), radix: 16));
-  } catch (e) {
-    return const Color(0xFFFFFFFF);
+/// Class that holds information about the possible tile icon
+class MenuItemInfoIcon {
+  late final int? code;
+  late final String? emoji;
+  late final String? url;
+  late final String? colour;
+
+  MenuItemInfoIcon({this.code, this.emoji, this.url, this.colour});
+
+  MenuItemInfoIcon.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+    emoji = json['emoji'];
+    url = json['url'];
+    colour = json['colour'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['code'] = code;
+    data['emoji'] = emoji;
+    data['url'] = url;
+    data['colour'] = colour;
+
+    return data;
   }
 }
 
@@ -28,21 +40,88 @@ class MenuItemInfo {
   late int indexInLevel;
   late String title;
   late Color textColor;
+  late MenuItemInfoIcon? _icon;
   late List<MenuItemInfo> tiles;
 
   MenuItemInfo({required this.id, required this.title, this.tiles = const []});
+
+  /// Converts a [hexString] to a Color.
+  /// Color white is returned by default.
+  Color _hexToColor(String hexString) {
+    try {
+      final buffer = StringBuffer();
+      if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
+      buffer.write(hexString.replaceFirst('#', ''));
+      return Color(int.parse(buffer.toString(), radix: 16));
+    } catch (e) {
+      return const Color(0xFFFFFFFF);
+    }
+  }
+
+  /// Gets the icon widget of the tile.
+  /// The priority of the icon retrieved is by:
+  /// 1 - the `code` field.
+  /// 2 - the `emoji` field.
+  /// 3 - the `url` field.
+  /// If there is no icon, the `null` is returned.
+  Widget? getIcon() {
+    bool iconExists = _icon != null;
+
+    // Check if any icon information exists
+    if (iconExists) {
+
+      // Icon parameters
+      int? iconCode = _icon?.code;
+      String? emojiText = _icon?.emoji;
+      String? imageUrl = _icon?.url;
+      String? colourHex = _icon?.colour;
+
+      // Icon colour
+      Color colour = _hexToColor(colourHex!);
+
+      if (iconCode != null) {
+        return Icon(
+          IconData(iconCode, fontFamily: 'MaterialIcons'),
+          color: colour,
+        );
+      }
+
+      if (emojiText != null) {
+        return Text(emojiText.toString(), style: TextStyle(color: colour, fontSize: 30));
+      }
+
+      if(imageUrl != null) {
+        return Container(
+          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          child: Image.network(imageUrl, fit: BoxFit.fitHeight, height: 64));
+      }
+    } 
+    
+    // If there's no icon information, return null
+    else {
+      return null;
+    }
+  }
 
   /// Converts `json` text to BasicTile
   MenuItemInfo.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     indexInLevel = json['index_in_level'];
     title = json['title'];
-    textColor = hexToColor(json['text_color']);
+    textColor = _hexToColor(json['text_color']);
+
+    // Decoding `tiles` field
     if (json['tiles'] != null) {
       tiles = [];
       json['tiles'].forEach((v) {
         tiles.add(MenuItemInfo.fromJson(v));
       });
+    }
+
+    _icon = null;
+    // Decoding `icon` field
+    if (json['icon'] != null) {
+      _icon = MenuItemInfoIcon.fromJson(json['icon']);
     }
   }
 
@@ -52,11 +131,19 @@ class MenuItemInfo {
     data['index_in_level'] = indexInLevel;
     data['title'] = title;
     data['text_color'] = '#${textColor.value.toRadixString(16)}';
+
+    // Adding `tiles` field
     if (tiles.isNotEmpty) {
       data['tiles'] = tiles.map((v) => v.toJson()).toList();
     } else {
       data['tiles'] = [];
     }
+
+    // Adding `icon` field
+    if (_icon != null) {
+      data['icon'] = _icon!.toJson();
+    }
+
     return data;
   }
 }
@@ -67,7 +154,7 @@ class MenuItemInfo {
 Future<List<MenuItemInfo>> loadMenuItems() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  //await prefs.remove(storageKey);
+  await prefs.remove(storageKey);
 
   final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
 

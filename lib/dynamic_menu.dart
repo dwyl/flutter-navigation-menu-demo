@@ -145,6 +145,7 @@ class _MenuItemState extends State<MenuItem> {
         decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
         child: ListTile(
             contentPadding: EdgeInsets.only(left: widget.leftPadding),
+            leading: widget.info.getIcon(),
             title: Text(widget.info.title,
                 style: TextStyle(
                   fontSize: 25,
@@ -172,6 +173,7 @@ class _MenuItemState extends State<MenuItem> {
             _expanded ? Icons.expand_less : Icons.arrow_drop_down,
             color: Colors.white,
           ),
+          leading: widget.info.getIcon(),
           children: [
             ReorderableListView(
               // https://stackoverflow.com/questions/56726298/nesting-reorderable-lists

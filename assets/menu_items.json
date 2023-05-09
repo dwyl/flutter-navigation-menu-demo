@@ -4,18 +4,33 @@
     "index_in_level": 0,
     "title": "People",
     "text_color": "#Ffb97e",
+    "icon": {
+      "colour": "#Ffb97e",
+      "code": 61668,
+      "emoji": "🧑‍🤝‍🧑",
+      "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+    },
     "tiles": [
       {
         "id": 2,
         "index_in_level": 0,
         "title": "Online Now",
         "text_color": "#FFFFFF",
+        "icon": {
+          "colour": "#Ffb97e",
+          "emoji": "🧑‍🤝‍🧑",
+          "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+        },
         "tiles": [
           {
             "id": 3,
             "index_in_level": 0,
             "title": "Family",
             "text_color": "#FFFFFF",
+            "icon": {
+              "colour": "#Ffb97e",
+              "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+            },
             "tiles": []
           },
           {
