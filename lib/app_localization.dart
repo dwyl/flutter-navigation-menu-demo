@@ -17,6 +17,8 @@ class AppLocalization {
 
   /// This function will load requested language `.json` file and will assign it to the `_localizedValues` map
   Future loadLanguage() async {
+
+    // https://stackoverflow.com/questions/60079645/flutter-how-to-mock-a-call-to-rootbundle-loadstring-then-reset-the-mocked
     String jsonStringValues = await rootBundle.loadString('assets/i18n/${_locale.languageCode}.json', cache: false);
 
     Map<String, dynamic> mappedValues = json.decode(jsonStringValues);
