@@ -154,7 +154,7 @@ class MenuItemInfo {
 Future<List<MenuItemInfo>> loadMenuItems() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  //await prefs.remove(storageKey);
+  await prefs.remove(storageKey);
 
   final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
 

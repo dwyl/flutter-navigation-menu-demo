@@ -1,8 +1,6 @@
-import 'package:app/app_localization.dart';
 import 'package:app/menu.dart';
 import 'package:app/pages.dart';
 import 'package:app/dynamic_menu.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -15,17 +13,9 @@ void main() {
   const storageKey = 'menuItems';
 
   group('Open menu and simple navigation', () {
-    /// Function to set mock shared preferences in unit tests
-    setUp(() async {
-      final String jsonString = await rootBundle.loadString(jsonFilePath);
-      final Map<String, Object> values = <String, Object>{storageKey: jsonString};
-      SharedPreferences.setMockInitialValues(values);
-    });
-
     testWidgets('Normal setup', (WidgetTester tester) async {
       // Build our app and trigger a frame.
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       // Verify that our counter starts at 0.
       expect(find.text('This is the main page'), findsOneWidget);
@@ -33,7 +23,6 @@ void main() {
 
     testWidgets('Tapping on todo item should make menu button appear', (WidgetTester tester) async {
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -51,7 +40,6 @@ void main() {
 
     testWidgets('Tapping on icon menu should show drawer menu', (WidgetTester tester) async {
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -83,7 +71,6 @@ void main() {
 
     testWidgets('Navigating into Tours Page', (WidgetTester tester) async {
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -121,7 +108,6 @@ void main() {
 
     testWidgets('Navigating into Settings Page', (WidgetTester tester) async {
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -182,7 +168,6 @@ void main() {
     testWidgets('Normal setup with shared preferences should show dynamic menu', (WidgetTester tester) async {
       // Initialize app
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -205,7 +190,6 @@ void main() {
     testWidgets('Click on first expandable menu item', (WidgetTester tester) async {
       // Initialize app
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -240,7 +224,6 @@ void main() {
     testWidgets('Drag and drop nested elements', (WidgetTester tester) async {
       // Initialize app
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -267,7 +250,7 @@ void main() {
       var menuItemTitles = find.byType(MenuItem).evaluate().toList().map(
         (e) {
           var menuItem = e.widget as MenuItem;
-          return menuItem.info.title['en'];
+          return menuItem.info.title;
         },
       ).toList();
 
@@ -285,7 +268,7 @@ void main() {
       menuItemTitles = find.byType(MenuItem).evaluate().toList().map(
         (e) {
           var menuItem = e.widget as MenuItem;
-          return menuItem.info.title['en'];
+          return menuItem.info.title;
         },
       ).toList();
 
@@ -293,12 +276,12 @@ void main() {
     });
 
     testWidgets('Drag and drop nested elements on third level', (WidgetTester tester) async {
+
       // To mock the icons fetching images from Network.
       // See https://github.com/stelynx/network_image_mock.
       mockNetworkImagesFor(() async {
         // Initialize app
         await tester.pumpWidget(const App());
-        await tester.pumpAndSettle();
 
         final menuButton = find.byKey(iconKey);
         final todoItem = find.byKey(todoItemKey);
@@ -340,7 +323,6 @@ void main() {
     testWidgets('Drag and drop root elements', (WidgetTester tester) async {
       // Initialize app
       await tester.pumpWidget(const App());
-      await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
       final todoItem = find.byKey(todoItemKey);
@@ -361,7 +343,7 @@ void main() {
       var menuItemTitles = find.byType(MenuItem).evaluate().toList().map(
         (e) {
           var menuItem = e.widget as MenuItem;
-          return menuItem.info.title['en'];
+          return menuItem.info.title;
         },
       ).toList();
 
@@ -379,7 +361,7 @@ void main() {
       menuItemTitles = find.byType(MenuItem).evaluate().toList().map(
         (e) {
           var menuItem = e.widget as MenuItem;
-          return menuItem.info.title['en'];
+          return menuItem.info.title;
         },
       ).toList();
 

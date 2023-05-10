@@ -2,10 +2,7 @@
   {
     "id": 1,
     "index_in_level": 0,
-    "title": {
-      "en": "People",
-      "pt": "Pessoas"
-    },    
+    "title": "People",
     "text_color": "#Ffb97e",
     "icon": {
       "colour": "#Ffb97e",
@@ -17,10 +14,7 @@
       {
         "id": 2,
         "index_in_level": 0,
-        "title": {
-          "en": "Online Now",
-          "pt": "Online agora"
-        },
+        "title": "Online Now",
         "text_color": "#FFFFFF",
         "icon": {
           "colour": "#Ffb97e",
@@ -31,10 +25,7 @@
           {
             "id": 3,
             "index_in_level": 0,
-            "title": {
-              "en": "Family",
-              "pt": "Família"
-            },
+            "title": "Family",
             "text_color": "#FFFFFF",
             "icon": {
               "colour": "#Ffb97e",
@@ -45,29 +36,20 @@
           {
             "id": 4,
             "index_in_level": 1,
-            "title": {
-              "en": "Friends",
-              "pt": "Amigos"
-            },
+            "title": "Friends",
             "text_color": "#FFFFFF",
             "tiles": [
               {
                 "id": 5,
                 "index_in_level": 0,
-                "title": {
-                  "en": "Sports Team",
-                  "pt": "Clube"
-                },
+                "title": "Sports Team",
                 "text_color": "#FFFFFF",
                 "tiles": []
               },
               {
                 "id": 6,
                 "index_in_level": 1,
-                "title": {
-                  "en": "Gamerz",
-                  "pt": "Gamerz"
-                },
+                "title": "Gamerz",
                 "text_color": "#FFFFFF",
                 "tiles": []
               }
@@ -76,10 +58,7 @@
           {
             "id": 7,
             "index_in_level": 2,
-            "title": {
-              "en": "Work",
-              "pt": "Trabalho"
-            },
+            "title": "Work",
             "text_color": "#FFFFFF",
             "tiles": []
           }
@@ -88,10 +67,7 @@
       {
         "id": 8,
         "index_in_level": 1,
-        "title": {
-          "en": "Everyone",
-          "pt": "Todos"
-        },
+        "title": "Everyone",
         "text_color": "#FFFFFF",
         "tiles": []
       }
@@ -100,10 +76,7 @@
   {
     "id": 9,
     "index_in_level": 1,
-    "title": {
-      "en": "Potaro",
-      "pt": "Potaro"
-    },
+    "title": "Potaro",
     "text_color": "#0baedc",
     "tiles": []
   }
