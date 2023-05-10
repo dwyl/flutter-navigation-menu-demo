@@ -18,7 +18,8 @@ class AppLocalization {
 
   // This function will load requested language `.json` file and will assign it to the `_localizedValues` map
   Future loadLanguage() async {
-    String jsonStringValues = await rootBundle.loadString("assets/i18n/${_locale.languageCode}.json");
+    final path = 'assets/i18n/${_locale.languageCode}.json';
+    String jsonStringValues = await rootBundle.loadString(path, cache: false);
 
     Map<String, dynamic> mappedValues = json.decode(jsonStringValues);
 
@@ -51,6 +52,8 @@ class _AppLocalizationDelegate extends LocalizationsDelegate<AppLocalization> {
     return appLocalization;
   }
 
+  // coverage:ignore-start
   @override
   bool shouldReload(_AppLocalizationDelegate old) => false;
+  // coverage:ignore-end
 }

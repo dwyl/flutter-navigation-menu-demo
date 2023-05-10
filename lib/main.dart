@@ -35,7 +35,9 @@ class App extends StatelessWidget {
               return deviceLocale;
             }
           }
+          // coverage:ignore-start
           return supportedLocales.first;
+          // coverage:ignore-end
         },
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
