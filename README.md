@@ -45,6 +45,11 @@ building a navigation menu in `Flutter`.
     - [5.5 Reordering items](#55-reordering-items)
     - [5.6 Adding text customization](#56-adding-text-customization)
     - [5.7 Adding icons to menu items](#57-adding-icons-to-menu-items)
+  - [6. Adding `i18n` to our app](#6-adding-i18n-to-our-app)
+    - [6.1 Adding supported languages and delegates](#61-adding-supported-languages-and-delegates)
+    - [6.2 Creating our custom delegate for localizing our own labels](#62-creating-our-custom-delegate-for-localizing-our-own-labels)
+    - [6.3 Changing labels according to locale](#63-changing-labels-according-to-locale)
+    - [6.4 Using `Riverpod` to toggle between languages](#64-using-riverpod-to-toggle-between-languages)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -2143,7 +2148,7 @@ we need to add `physics: const NeverScrollableScrollPhysics()`.
 For more information, visit
 https://stackoverflow.com/questions/56726298/nesting-reorderable-lists.
 
-In `ReorderableListView`, when the user *long presses the menu item*
+In `ReorderableListView`, when the person *long presses the menu item*
 and drags it,
 the `onReorder` callback function is invoked.
 We are calling a function called 
@@ -2189,7 +2194,7 @@ is that the `indexInLevel` field
 of the menu item's children
 are updated to match the person's reordering
 and then it's updated
-on the user preferences
+on the person preferences
 by calling `updateRootObjectsInPreferences`.
 The latter function
 *receives the updated menu items*.
@@ -2748,6 +2753,394 @@ Great job! 🥳
 > most up-to-date `JSON` file contents.
 >
 > Use `await prefs.remove(storageKey);` for this.
+
+
+## 6. Adding `i18n` to our app
+
+Even though English is the most popular language currently,
+there are still 
+[billions](https://www.statista.com/statistics/266808/the-most-spoken-languages-worldwide/)
+of people who don't speak this language.
+It's not fair to leave them out!
+So let's add a way for users to toggle between languages.
+
+To keep things simple, 
+we'll allow users to toggle between
+**Portuguese** and **English**.
+
+Let's start by adding 
+[`flutter_localizations`](https://docs.flutter.dev/accessibility-and-localization/internationalization#setting-up) 
+to our `pubspec.yml` file
+in the `dependencies` section.
+
+```yml
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+```
+
+We're going to be storing our translation files
+inside the `assets/i18n` folder.
+Let's give our app access to this folder
+by adding this new folder to `pubspec.yml`
+in the `assets` folder.
+
+```yml
+  assets:
+    - assets/images/
+    - assets/i18n/
+    - assets/menu_items.json
+```
+
+Now that we have everything ready,
+let's start writing some code! 🧑‍💻
+
+
+### 6.1 Adding supported languages and delegates
+
+Let's head over to `main.dart` and
+under the `MaterialApp` widget,
+let's set the 
+[`supportedLocales`](https://api.flutter.dev/flutter/material/MaterialApp/supportedLocales.html) 
+property.
+This property has a list of locales that the app 
+*has been localized for*.
+By default, if you're running the app on a simutor,
+*American English* is supported.
+Let's add another one.
+
+```dart
+MaterialApp(
+  // ...
+  supportedLocales: const [
+    Locale('en', 'US'),
+    Locale('pt', 'PT'),
+  ],
+)
+```
+
+We now need to *verify if the person's device locale is supported by our app or not*.
+`MaterialApp` has a property called
+[`localeResolutionCallback`](https://api.flutter.dev/flutter/widgets/WidgetsApp/localeResolutionCallback.html)
+for this.
+We will *loop through the `supportedLocales`*
+and check if our app supports the person's device locale or not.
+If not, we default to `English`.
+
+```dart
+MaterialApp(
+  // ...
+  localeResolutionCallback: (deviceLocale, supportedLocales) {
+    for (var locale in supportedLocales) {
+      if (locale.languageCode == deviceLocale!.languageCode && locale.countryCode == deviceLocale.countryCode) {
+        return deviceLocale;
+      }
+    }
+    return supportedLocales.first;
+  },
+)
+```
+
+The last setting we need to define under `MaterialApp`
+relates to **delegates**.
+A localization delegate 
+is responsible for providing localized values to the app as per the person's locale. 
+It's essentially *a bridge* between the app and the localization data.
+
+`Flutter` allows us to create `MaterialApp`s or `CupertinoApp`s, for example.
+These have in-built widgets that should also be translated.
+For these to be correctly translated,
+we need to add delegates for these.
+Luckily, `Flutter` provides us default delegates for these,
+as well as a special delegate
+(`GlobalWidgetsLocalizations`) 
+which handles
+the direction of the text 
+(useful in the Arabic language, for example).
+
+Under `MaterialApp`,
+add the following code:
+
+```dart
+MaterialApp(
+        // ...
+  localizationsDelegates: const [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    AppLocalization.delegate
+  ],
+)
+```
+
+We've also added a delegate from `AppLocalization`.
+*This class doesn't exist.*
+Let's create it!
+This `AppLocalization` class will handle
+everything `i18n` related under-the-hood!
+
+
+### 6.2 Creating our custom delegate for localizing our own labels
+
+Let's create our own cusotm delegate 
+to help translate our app's labels into 
+any language we'd like.
+
+For this, create a file called `app_localization.dart`
+inside `lib`.
+
+```dart
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class AppLocalization {
+  late final Locale _locale;
+
+  AppLocalization(this._locale);
+
+  static AppLocalization of(BuildContext context) {
+    return Localizations.of<AppLocalization>(context, AppLocalization)!;
+  }
+
+  late Map<String, String> _localizedValues;
+
+
+  Future loadLanguage() async {
+    String jsonStringValues = await rootBundle.loadString('assets/i18n/${_locale.languageCode}.json', cache: false);
+
+    Map<String, dynamic> mappedValues = json.decode(jsonStringValues);
+
+    // converting `dynamic` value to `String`, because `_localizedValues` is of type Map<String,String>
+    _localizedValues = mappedValues.map((key, value) => MapEntry(key, value.toString()));
+  }
+
+
+  String? getTranslatedValue(String key) {
+    return _localizedValues[key];
+  }
+
+  static const LocalizationsDelegate<AppLocalization> delegate = _AppLocalizationDelegate();
+}
+
+
+class _AppLocalizationDelegate extends LocalizationsDelegate<AppLocalization> {
+  const _AppLocalizationDelegate();
+
+
+  @override
+  bool isSupported(Locale locale) {
+    return ["en", "pt"].contains(locale.languageCode);
+  }
+
+
+  @override
+  Future<AppLocalization> load(Locale locale) async {
+    AppLocalization appLocalization = AppLocalization(locale);
+    await appLocalization.loadLanguage();
+    return appLocalization;
+  }
+
+
+  @override
+  bool shouldReload(_AppLocalizationDelegate old) => false;
+}
+
+```
+
+Here we are creating two classes:
+`AppLocalization`, which is our main localization class
+in which we will provide `_AppLocalizationDelegate`,
+our custom delegate class.
+
+Let's go over the latter first. 
+Because we are extending the 
+[`LocalizationsDelegate`](https://api.flutter.dev/flutter/widgets/LocalizationsDelegate-class.html) class,
+we need to override the `isSupported`, `load` and `shouldReload` functions.
+These functions are self-explanatory:
+- `isSupported` checks if a given locale is supported.
+- `load`, which given a locale it *loads* the language labels
+to be displayed 
+(it calls a function in `AppLocalization` that does this).
+- `shouldReload`,
+returns true if the resources for this delegate 
+should be loaded again by calling the `load` method.
+
+In the `AppLocalization` class, 
+we offer the custom delegate class
+we've defined earlier 
+and three public functions:
+
+- `of`, which is a useful method
+to access the methods of the class.
+- `loadLanguage`,
+which loads the translation file 
+according to the given locale.
+- `getTranslatedValue`,
+which wll be used to display the label
+translated to the current chosen locale of the device.
+
+Now we need to add the translation files!
+We are going to create two files in `assets/i18n`:
+`en.json` and `pt.json`, 
+the translations for English and Portuguese, respectively. 
+
+Check both files inside [`assets/i18n`](https://github.com/dwyl/flutter-navigation-menu-demo/tree/c40d9dde2f537f3f58cea9ef5575b7dc3b5de575/assets/i18n).
+
+
+### 6.3 Changing labels according to locale
+
+Now we need to display the localized label
+across our app!
+We just need to find all the `Text` instances
+we want to change according to the locale
+and use 
+`AppLocalization.of(context).getTranslatedValue("JSON_KEY_HERE").toString()`.
+
+Do this on across the app.
+Check 
+[`c60546`](https://github.com/dwyl/flutter-navigation-menu-demo/pull/5/commits/c60546c65989f336334156ade489c0451993bfe9)
+to see the lines you need to change.
+
+
+### 6.4 Using `Riverpod` to toggle between languages
+
+We are going to use `Riverpod`,
+a state management library,
+to make it easy for the person 
+to change languages within the app.
+
+If you're not aware of what a state management library is
+and don't know how `Riverpod` works,
+we recommend you visit 
+[`dwyl/flutter-todo-list-tutorial`](https://github.com/dwyl/flutter-todo-list-tutorial)
+to build foundational knowledge on this subject.
+
+After installing `Riverpod`, 
+let's wrap our app with a `ProviderScope` 
+in `main.dart`,
+so it's providers created with `Riverpod`
+are accessible throughout the widget tree.
+
+```dart
+void main() {
+  runApp(const ProviderScope(child: App()));
+}
+```
+
+Below the `main()` function,
+we'll create our `Provider`
+which will hold the current locale that is chosen by the person.
+
+```dart
+final currentLocaleProvider = StateProvider<Locale>((_) => const Locale('en', 'US'));
+```
+
+Now let's use this provider!
+In the `App` class,
+change the interface it extends.
+Instead of:
+
+```dart
+class App extends StatelessWidget
+```
+
+Change it to:
+
+```dart
+class App extends ConsumerWidget
+```
+
+This interface is from `Riverpod`,
+which will make it easy for us
+to access the provider in the `App` widget.
+
+While we're at it,
+let's also change the `HomePage`
+and `_HomePageState` extending interfaces.
+
+```dart
+class HomePage extends ConsumerStatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  ConsumerState<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderStateMixin  
+```
+
+Now it's time to use our provider value!
+Inside `App`'s `build()` function,
+let's access the provider 
+and use it in the 
+[`locale`](https://api.flutter.dev/flutter/material/MaterialApp/locale.html)
+parameter of `MaterialApp`.
+
+```dart
+Widget build(BuildContext context, WidgetRef ref) {
+  final currentLocale = ref.watch(currentLocaleProvider); // add this
+
+  return MaterialApp(
+      title: 'Navigation Flutter Menu App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      debugShowCheckedModeBanner: false,
+      locale: currentLocale, // add this
+  )
+}
+```
+
+Finally,
+all that's left is add the two buttons
+to toggle between `Portuguese` and `English`.
+In `_HomePageState`,
+add the following piece of code
+at the end of the `children` array
+under `Column`.
+
+```dart
+  Padding(
+    padding: const EdgeInsets.only(top: 24.0),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        ElevatedButton(
+            onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('pt', 'PT');},
+            style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 161, 30, 30)),
+            child: const Text("PT")),
+        ElevatedButton(
+            onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('en', 'US');},
+            style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 18, 50, 110)),
+            child: const Text("EN")),
+      ],
+    ),
+  )
+```
+
+We're creating two `ElevatedButtons`
+and updating the provider value
+by using `ref.read(currentLocaleProvider.notifier).state = newValue`.
+
+> Check [`lib/main.dart`](https://github.com/dwyl/flutter-navigation-menu-demo/blob/c40d9dde2f537f3f58cea9ef5575b7dc3b5de575/lib/main.dart)
+> to see how the visit should look like after these changes.
+
+
+And that's it!
+If we run the app,
+we can see our `i18n` properly working
+across all the widget tree! 🎉
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/943770aa-aba3-442c-b2d9-ea775f9e4aad" width="300" />
+</p>
+
+
+
 
 # Star the repo! ⭐️
 
