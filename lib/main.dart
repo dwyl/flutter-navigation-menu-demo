@@ -8,6 +8,8 @@ import 'menu.dart';
 const iconKey = Key("menu_icon");
 const todoItemKey = Key("todo_item");
 const homePageKey = Key("home_page");
+const ptButtonkey = Key("pt_button");
+const enButtonkey = Key("en_button");
 
 // coverage:ignore-start
 void main() {
@@ -143,11 +145,17 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   ElevatedButton(
-                      onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('pt', 'PT');},
+                      key: ptButtonkey,
+                      onPressed: () {
+                        ref.read(currentLocaleProvider.notifier).state = const Locale('pt', 'PT');
+                      },
                       style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 161, 30, 30)),
                       child: const Text("PT")),
                   ElevatedButton(
-                      onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('en', 'US');},
+                      key: enButtonkey,
+                      onPressed: () {
+                        ref.read(currentLocaleProvider.notifier).state = const Locale('en', 'US');
+                      },
                       style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 18, 50, 110)),
                       child: const Text("EN")),
                 ],

@@ -2,6 +2,7 @@ import 'package:app/menu.dart';
 import 'package:app/pages.dart';
 import 'package:app/dynamic_menu.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:app/main.dart';
@@ -15,7 +16,7 @@ void main() {
   group('Open menu and simple navigation', () {
     testWidgets('Normal setup', (WidgetTester tester) async {
       // Build our app and trigger a frame.
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       // Verify that our counter starts at 0.
@@ -23,7 +24,7 @@ void main() {
     });
 
     testWidgets('Tapping on todo item should make menu button appear', (WidgetTester tester) async {
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -40,8 +41,31 @@ void main() {
       expect(menuButton.hitTestable(), findsOneWidget);
     });
 
+    testWidgets('Toggling between languages should make texts different', (WidgetTester tester) async {
+      await tester.pumpWidget(const ProviderScope(child: App()));
+      await tester.pumpAndSettle();
+
+      final ptButton = find.byKey(ptButtonkey);
+      final enButton = find.byKey(enButtonkey);
+
+      expect(find.text('This is the main page'), findsOneWidget);
+
+      // Tap on PT
+      await tester.tap(ptButton);
+      await tester.pumpAndSettle();
+
+      // Verify that the text has changed
+      expect(find.text('Esta é a página inicial.'), findsOneWidget);
+
+      // Toggle back to english
+      await tester.tap(enButton);
+      await tester.pumpAndSettle();
+
+      expect(find.text('This is the main page'), findsOneWidget);
+    });
+
     testWidgets('Tapping on icon menu should show drawer menu', (WidgetTester tester) async {
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -73,7 +97,7 @@ void main() {
     });
 
     testWidgets('Navigating into Tours Page', (WidgetTester tester) async {
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -111,7 +135,7 @@ void main() {
     });
 
     testWidgets('Navigating into Settings Page', (WidgetTester tester) async {
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -172,7 +196,7 @@ void main() {
 
     testWidgets('Normal setup with shared preferences should show dynamic menu', (WidgetTester tester) async {
       // Initialize app
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -195,7 +219,7 @@ void main() {
 
     testWidgets('Click on first expandable menu item', (WidgetTester tester) async {
       // Initialize app
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -230,7 +254,7 @@ void main() {
 
     testWidgets('Drag and drop nested elements', (WidgetTester tester) async {
       // Initialize app
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
@@ -288,7 +312,7 @@ void main() {
       // See https://github.com/stelynx/network_image_mock.
       mockNetworkImagesFor(() async {
         // Initialize app
-        await tester.pumpWidget(const App());
+        await tester.pumpWidget(const ProviderScope(child: App()));
         await tester.pumpAndSettle();
 
         final menuButton = find.byKey(iconKey);
@@ -330,7 +354,7 @@ void main() {
 
     testWidgets('Drag and drop root elements', (WidgetTester tester) async {
       // Initialize app
-      await tester.pumpWidget(const App());
+      await tester.pumpWidget(const ProviderScope(child: App()));
       await tester.pumpAndSettle();
 
       final menuButton = find.byKey(iconKey);
