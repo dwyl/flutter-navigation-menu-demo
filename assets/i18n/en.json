@@ -1,4 +1,16 @@
 {
   "title": "This is the main page",
-  "description": "Check the todo item below to open the menu above to check more pages."
+  "description": "Check the todo item below to open the menu above to check more pages.",
+
+  "menu.todo": "Todo List (Personal)",
+  "menu.feature": "Feature Tour",
+  "menu.settings": "Settings",
+
+  "feature_page.title": "This is the Tour page 🚩",
+  "feature_page.description": "As you can see, this is just a sample page. You can go back by pressing the button below.",
+
+  "settings_page.title": "This is the Settings page ⚙️",
+  "settings_page.description": "As you can say, this is just a sample page. You can go back by pressing the button below.",
+
+  "goBack_button": "Go back"
 }

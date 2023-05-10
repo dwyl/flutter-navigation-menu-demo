@@ -1,5 +1,17 @@
 {
     "title": "Esta é a página inicial.",
-    "description": "Clica no item abaixo para abrir o menu acima para ver mais páginas."
+    "description": "Clica no item abaixo para abrir o menu acima para ver mais páginas.",
+
+    "menu.todo": "Lista de tarefas (Pessoal)",
+    "menu.feature": "Visão geral",
+    "menu.settings": "Definições",
+
+    "feature_page.title": "Esta é a página de visão geral 🚩",
+    "feature_page.description": "Isto é apenas uma página de exemplo. Para voltar, clique no botão abaixo.",
+
+    "settings_page.title": "Esta é a página de configurações ⚙️",
+    "settings_page.description": "Isto é apenas uma página de exemplo. Para voltar, clique no botão abaixo.",
+  
+    "goBack_button": "Voltar"
   }
   

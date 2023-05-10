@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:app/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -16,15 +15,14 @@ class AppLocalization {
 
   late Map<String, String> _localizedValues;
 
-  // This function will load requested language `.json` file and will assign it to the `_localizedValues` map
+  /// This function will load requested language `.json` file and will assign it to the `_localizedValues` map
   Future loadLanguage() async {
-    final path = 'assets/i18n/${_locale.languageCode}.json';
-    String jsonStringValues = await rootBundle.loadString(path, cache: false);
+    String jsonStringValues = await rootBundle.loadString('assets/i18n/${_locale.languageCode}.json', cache: false);
 
     Map<String, dynamic> mappedValues = json.decode(jsonStringValues);
 
-    _localizedValues = mappedValues.map((key, value) =>
-        MapEntry(key, value.toString())); // converting `dynamic` value to `String`, because `_localizedValues` is of type Map<String,String>
+    // converting `dynamic` value to `String`, because `_localizedValues` is of type Map<String,String>
+    _localizedValues = mappedValues.map((key, value) => MapEntry(key, value.toString()));
   }
 
   String? getTranslatedValue(String key) {

@@ -25,6 +25,7 @@ class App extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         debugShowCheckedModeBanner: false,
+        locale: const Locale('pt', 'PT'),
         supportedLocales: const [
           Locale('en', 'US'),
           Locale('pt', 'PT'),

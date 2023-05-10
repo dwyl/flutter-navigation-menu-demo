@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_localization.dart';
+
 const tourPageKey = Key("tour_page");
 const settingsPageKey = Key("settings_page");
 
@@ -14,16 +16,16 @@ class TourPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              "This is the Tour page 🚩",
-              style: TextStyle(fontSize: 30),
+            Text(
+              AppLocalization.of(context).getTranslatedValue("feature_page.title").toString(),
+              style: const TextStyle(fontSize: 30),
             ),
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                AppLocalization.of(context).getTranslatedValue("feature_page.description").toString(),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: Colors.black87),
+                style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
             ),
             ElevatedButton(
@@ -50,16 +52,16 @@ class SettingsPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              "This is the Settings page ⚙️",
-              style: TextStyle(fontSize: 30),
+            Text(
+              AppLocalization.of(context).getTranslatedValue("settings_page.title").toString(),
+              style: const TextStyle(fontSize: 30),
             ),
-            const Padding(
-              padding: EdgeInsets.all(16),
+            Padding(
+              padding: const EdgeInsets.all(16),
               child: Text(
-                "As you can say, this is just a sample page. You can go back by pressing the button below.",
+                AppLocalization.of(context).getTranslatedValue("settings_page.description").toString(),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 15, color: Colors.black87),
+                style: const TextStyle(fontSize: 15, color: Colors.black87),
               ),
             ),
             ElevatedButton(

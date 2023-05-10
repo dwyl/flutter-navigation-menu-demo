@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_localization.dart';
 import 'pages.dart';
 import 'dynamic_menu.dart';
 import 'settings.dart';
@@ -60,14 +61,14 @@ class _DrawerMenuState extends State<DrawerMenu> {
                   Container(
                     padding: const EdgeInsets.only(top: 15, bottom: 15),
                     decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
-                    child: const ListTile(
-                      leading: Icon(
+                    child: ListTile(
+                      leading: const Icon(
                         Icons.check_outlined,
                         color: Colors.white,
                         size: 50,
                       ),
-                      title: Text('Todo List (Personal)',
-                          style: TextStyle(
+                      title: Text(AppLocalization.of(context).getTranslatedValue("menu.todo").toString(),
+                          style: const TextStyle(
                             fontSize: 30,
                             color: Colors.white,
                           )),
@@ -83,8 +84,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         color: Colors.white,
                         size: 40,
                       ),
-                      title: const Text('Feature Tour',
-                          style: TextStyle(
+                      title: Text(AppLocalization.of(context).getTranslatedValue("menu.feature").toString(),
+                          style: const TextStyle(
                             fontSize: 25,
                             color: Colors.white,
                           )),
@@ -106,8 +107,8 @@ class _DrawerMenuState extends State<DrawerMenu> {
                         color: Colors.white,
                         size: 40,
                       ),
-                      title: const Text('Settings',
-                          style: TextStyle(
+                      title: Text(AppLocalization.of(context).getTranslatedValue("menu.settings").toString(),
+                          style: const TextStyle(
                             fontSize: 25,
                             color: Colors.white,
                           )),
