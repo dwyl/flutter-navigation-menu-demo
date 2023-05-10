@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'app_localization.dart';
 import 'menu.dart';
@@ -10,22 +11,27 @@ const homePageKey = Key("home_page");
 
 // coverage:ignore-start
 void main() {
-  runApp(const App());
+  runApp(const ProviderScope(child: App()));
 }
 // coverage:ignore-end
 
-class App extends StatelessWidget {
+/// Provider that tracks the current locale of the app
+final currentLocaleProvider = StateProvider<Locale>((_) => const Locale('en', 'US'));
+
+class App extends ConsumerWidget {
   const App({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final currentLocale = ref.watch(currentLocaleProvider);
+
     return MaterialApp(
         title: 'Navigation Flutter Menu App',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
         debugShowCheckedModeBanner: false,
-        locale: const Locale('pt', 'PT'),
+        locale: currentLocale,
         supportedLocales: const [
           Locale('en', 'US'),
           Locale('pt', 'PT'),
@@ -50,14 +56,14 @@ class App extends StatelessWidget {
   }
 }
 
-class HomePage extends StatefulWidget {
+class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  ConsumerState<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderStateMixin {
   bool showMenu = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -130,6 +136,22 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   showMenu = true;
                 });
               },
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 24.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  ElevatedButton(
+                      onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('pt', 'PT');},
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 161, 30, 30)),
+                      child: const Text("PT")),
+                  ElevatedButton(
+                      onPressed: () {ref.read(currentLocaleProvider.notifier).state = const Locale('en', 'US');},
+                      style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 18, 50, 110)),
+                      child: const Text("EN")),
+                ],
+              ),
             )
           ],
         ),
