@@ -19,6 +19,7 @@ class TourPage extends StatelessWidget {
             Text(
               AppLocalization.of(context).getTranslatedValue("feature_page.title").toString(),
               style: const TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
             ),
             Padding(
               padding: const EdgeInsets.all(16),
@@ -55,6 +56,7 @@ class SettingsPage extends StatelessWidget {
             Text(
               AppLocalization.of(context).getTranslatedValue("settings_page.title").toString(),
               style: const TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
             ),
             Padding(
               padding: const EdgeInsets.all(16),
