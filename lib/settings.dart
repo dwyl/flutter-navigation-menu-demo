@@ -34,11 +34,11 @@ class MenuItemInfoIcon {
   }
 }
 
-/// Class holding the information of the menu item tile
+/// Class holding the information of the tile
 class MenuItemInfo {
   late int id;
   late int indexInLevel;
-  late Map<String, dynamic> title;
+  late String title;
   late Color textColor;
   late MenuItemInfoIcon? _icon;
   late List<MenuItemInfo> tiles;
@@ -118,8 +118,8 @@ class MenuItemInfo {
       });
     }
 
-    // Decoding `icon` field
     _icon = null;
+    // Decoding `icon` field
     if (json['icon'] != null) {
       _icon = MenuItemInfoIcon.fromJson(json['icon']);
     }
@@ -154,7 +154,7 @@ class MenuItemInfo {
 Future<List<MenuItemInfo>> loadMenuItems() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
 
-  await prefs.remove(storageKey);
+  //await prefs.remove(storageKey);
 
   final String? jsonStringFromLocalStorage = prefs.getString(storageKey);
 
