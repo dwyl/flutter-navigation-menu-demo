@@ -49,6 +49,9 @@ building a navigation menu in `Flutter`.
     - [6.1 Adding supported languages and delegates](#61-adding-supported-languages-and-delegates)
     - [6.2 Creating our custom delegate for localizing our own labels](#62-creating-our-custom-delegate-for-localizing-our-own-labels)
     - [6.3 Changing labels according to locale](#63-changing-labels-according-to-locale)
+      - [6.3.1 A note on `i18n` on dynamic menus](#631-a-note-on-i18n-on-dynamic-menus)
+        - [6.3.1.1 Translations in `assets/menu_items.json`](#6311-translations-in-assetsmenu_itemsjson)
+        - [6.3.1.2 Lookup automatic translations of dynamic menu items](#6312-lookup-automatic-translations-of-dynamic-menu-items)
     - [6.4 Using `Riverpod` to toggle between languages](#64-using-riverpod-to-toggle-between-languages)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
@@ -3004,6 +3007,143 @@ Do this on across the app.
 Check 
 [`c60546`](https://github.com/dwyl/flutter-navigation-menu-demo/pull/5/commits/c60546c65989f336334156ade489c0451993bfe9)
 to see the lines you need to change.
+
+
+#### 6.3.1 A note on `i18n` on dynamic menus
+
+We've just added `i18n` capabilities to labels
+that are present in the static pages and menus,
+*not on the dynamic menu*.
+
+If you look at what happens with `Gmail`,
+you can create labels
+and nest each one like our dynamic menu.
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/1a344bf1-c3f0-4748-83d4-c7f9d565eb36" width="300" />
+</p>
+
+However, these labels **aren't translated**.
+And for good reason. 
+Do they actually need to be translated? 
+If the person has *defined them*,
+he *understands* what he means.
+
+However, we understand that you might want to give the person
+the *option* to toggle between translations
+from the dynamic menu items that they provide.
+In this case,
+we give two ideas that you can try to implement this
+on your own!
+
+> **Note**
+>
+> These are **suggestions** for implementation
+> and should be thought as a fun exercise.
+> Feel free to skip this, 
+> these are very much *optional*.
+
+
+##### 6.3.1.1 Translations in `assets/menu_items.json`
+
+One option is to have the label translations
+from the file that is parsed in the app `menu_items.json`.
+Here's how the file would look like:
+
+```json
+  {
+    "id": 1,
+    "index_in_level": 0,
+    "title": {
+      "en": "People",
+      "pt": "Pessoas"
+    },    
+    "text_color": "#Ffb97e",
+    "icon": {
+      "colour": "#Ffb97e",
+      "code": 61668,
+      "emoji": "🧑‍🤝‍🧑",
+      "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+    },
+  }
+```
+
+You would need to then parse the `title` 
+as a `late Map<String, dynamic>` class variable.
+
+You would later need to create a function
+inside `AppLocalization` to handle these labels, 
+like so:
+
+```dart
+  String getMenuItemTitle(MenuItemInfo item) {
+    final Map<String, dynamic> title = item.title;
+
+    return title[_locale.languageCode] ?? "";
+  }
+```
+
+And use it on the `dynamic_menu.dart` widgets,
+like:
+
+```dart
+Text(AppLocalization.of(context).getMenuItemTitle(widget.info))
+```
+
+
+##### 6.3.1.2 Lookup automatic translations of dynamic menu items
+
+Another possible venue is to 
+have a set of 
+**pre-determined values that the app will translate automatically**.
+
+For example, the person is using the app in `Portuguese`
+and has a menu item called `Definitions`.
+In our dictionary, the app would detect this word
+and translate it to `Definições`.
+
+For this, you would need to have 
+files to translate from both `PT` to `EN`
+and `EN` to `PT`. 
+The number of these types of files would grow exponentially 
+as more languages would be supported.
+
+For example:
+
+```json
+// en-pt.json
+{
+    "settings": "definições",
+    "home": "início",
+
+    "people": "pessoas",
+    "online now": "online agora"
+}
+```
+
+
+```json
+// pt-en.json
+{
+    "settings": "definições",
+    "home": "início",
+
+    "people": "pessoas",
+    "online now": "online agora"
+}
+```
+
+We could *use* these key-value pairs
+to translate the menu item title automatically.
+If the user had `PT` setup, 
+we would look at the `en-pt.json` file
+and try to translate if any of the keys were found.
+
+However, as it was previously mentioned,
+this method isn't sustainable at scale.
+If we added another language,
+we would need to look at `en-pt.json`
+and `fr-pt.json`, for example.
 
 
 ### 6.4 Using `Riverpod` to toggle between languages
