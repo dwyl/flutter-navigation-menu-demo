@@ -53,6 +53,7 @@ building a navigation menu in `Flutter`.
         - [6.3.1.1 Translations in `assets/menu_items.json`](#6311-translations-in-assetsmenu_itemsjson)
         - [6.3.1.2 Lookup automatic translations of dynamic menu items](#6312-lookup-automatic-translations-of-dynamic-menu-items)
     - [6.4 Using `Riverpod` to toggle between languages](#64-using-riverpod-to-toggle-between-languages)
+    - [6.5 Fixing decoration when expanding titles](#65-fixing-decoration-when-expanding-titles)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -3278,6 +3279,131 @@ across all the widget tree! 🎉
 <p align="center">
   <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/943770aa-aba3-442c-b2d9-ea775f9e4aad" width="300" />
 </p>
+
+
+### 6.5 Fixing decoration when expanding titles
+
+You might have noticed that,
+by having the borders always showing on top and bottom of each menu item,
+when expanding menu items
+**an overlap is noticeable**.
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/e4a57d94-8cef-4a32-b990-3d929dd35eb1" width="300" />
+</p>
+
+You can clearly see
+that under `Work` and `Everyone`,
+the border is repeated.
+This is not intended...
+
+So let's fix this!
+
+For this,
+we are going to install
+[`collection`](https://pub.dev/packages/collection).
+This package will give us handy utils 
+to operate on lists.
+We'll be using the `mapIndexed` function,
+which will allows us to know the `index`
+of a given list element whilst iterating over it.
+
+Head over to `lib/dynamic_menu.dart`,
+locate the `MenuItem` class
+and add two fields:
+- `isLastInArray`,
+a boolean which states if the element
+is last in the array of menu items.
+- `isFirstInArray`,
+self-explanatory.
+
+```dart
+class MenuItem extends StatefulWidget {
+  final Key key;
+  final MenuItemInfo info;
+  final double leftPadding;
+  final bool isLastInArray;    // add this
+  final bool isFirstInArray;   // add this
+
+  const MenuItem({required this.key, required this.info, this.leftPadding = 16, this.isLastInArray = false, this.isFirstInArray = false})
+      : super(key: key);
+
+  @override
+  State<MenuItem> createState() => _MenuItemState();
+}
+```
+
+Now we need to set these new fields
+when instantiating `MenuItems`.
+Find `_MenuItemState` and its `build()` function.
+When rendering a `ReorderableListView`,
+we are going to change the `children` parameter
+to map over the children list of menu items
+to use the `mapIndexed` function.
+
+```dart
+children: childrenMenuItemInfoList.mapIndexed((index, tile) {
+  // Check if item is first or last in array
+  final isLastInArray = index == childrenMenuItemInfoList.length - 1;
+  final isFirstInArray = index == 0;
+
+  // Render menu item
+  return MenuItem(
+    key: ValueKey(tile.id),
+    info: tile,
+    leftPadding: widget.leftPadding + 16,
+    isLastInArray: isLastInArray,
+    isFirstInArray: isFirstInArray,
+  );
+}).toList()
+```
+
+Awesome!
+Now all that's left is making use of these variables 
+when rendering the decoration.
+Let's migrate the behaviour of the decoration to a private function.
+In the same class,
+locate both 
+`decoration` parameters
+and change them like so:
+
+```dart
+  decoration: _renderBorderDecoration(),
+```
+
+In the same class `_MenuItemState`,
+let's implement this function!
+
+```dart
+BoxDecoration _renderBorderDecoration() {
+  if (widget.isLastInArray) {
+    return const BoxDecoration();
+  }
+
+  if (widget.isFirstInArray) {
+    return const BoxDecoration(border: Border(top: BorderSide(color: Colors.white), bottom: BorderSide(color: Colors.white)));
+  }
+
+  return const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white)));
+}
+```
+
+As you can see, we are rendering the container borders
+depending on its position within the list.
+This way, we prevent the overlap issue that was occuring earlier.
+
+> If you want to see the changes made,
+> check [`6cdd78b`](https://github.com/dwyl/flutter-navigation-menu-demo/pull/5/commits/6cdd78bbc2c9b8b8fcceba20448b77ed8dc3a2f3).
+
+If you run the app,
+you will see that the problem is resolved!
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/1054ec1f-384f-4e6e-a80c-470c067f49fc" width="300" />
+</p>
+
+Now the menu items look consistent 
+across the nested menu item lists! 🥳
 
 
 
