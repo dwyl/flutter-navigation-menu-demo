@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
 import 'settings.dart';
@@ -91,8 +92,11 @@ class MenuItem extends StatefulWidget {
   final Key key;
   final MenuItemInfo info;
   final double leftPadding;
+  final bool isLastInArray;
+  final bool isFirstInArray;
 
-  const MenuItem({required this.key, required this.info, this.leftPadding = 16}) : super(key: key);
+  const MenuItem({required this.key, required this.info, this.leftPadding = 16, this.isLastInArray = false, this.isFirstInArray = false})
+      : super(key: key);
 
   @override
   State<MenuItem> createState() => _MenuItemState();
@@ -136,13 +140,26 @@ class _MenuItemState extends State<MenuItem> {
     updateDeeplyNestedObjectInPreferences(menuItemInfo, menuItemInfoList);
   }
 
+  /// Function that renders the border decoration according to if the menu item is last on the array
+  BoxDecoration _renderBorderDecoration() {
+    if (widget.isLastInArray) {
+      return const BoxDecoration();
+    }
+
+    if (widget.isFirstInArray) {
+      return const BoxDecoration(border: Border(top: BorderSide(color: Colors.white), bottom: BorderSide(color: Colors.white)));
+    }
+
+    return const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white)));
+  }
+
   @override
   Widget build(BuildContext context) {
     // If the tile's children is empty, we render the leaf tile
     if (childrenMenuItemInfoList.isEmpty) {
       return Container(
         key: widget.key,
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+        decoration: _renderBorderDecoration(),
         child: ListTile(
             contentPadding: EdgeInsets.only(left: widget.leftPadding),
             leading: widget.info.getIcon(),
@@ -157,13 +174,13 @@ class _MenuItemState extends State<MenuItem> {
     // If the tile has children, we render this as an expandable tile.
     else {
       return Container(
-        decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white))),
+        decoration: _renderBorderDecoration(),
 
         // Rendering `ExpansionTile` which expands to render the children.
         // The children are rendered in a `ReorderableListView`
         // so they can be reordered on the same level.
         child: ExpansionTile(
-          tilePadding: EdgeInsets.only(left: widget.leftPadding),
+          tilePadding: EdgeInsets.only(left: widget.leftPadding, top: 6, bottom: 6),
           title: Text(widget.info.title,
               style: TextStyle(
                 fontSize: 25,
@@ -181,7 +198,20 @@ class _MenuItemState extends State<MenuItem> {
               physics: const NeverScrollableScrollPhysics(),
               proxyDecorator: _proxyDecorator,
               onReorder: (oldIndex, newIndex) => _reorderTiles(oldIndex, newIndex, widget.info),
-              children: childrenMenuItemInfoList.map((tile) => MenuItem(key: ValueKey(tile.id), info: tile, leftPadding: widget.leftPadding + 16)).toList()
+              children: childrenMenuItemInfoList.mapIndexed((index, tile) {
+                // Check if item is first or last in array
+                final isLastInArray = index == childrenMenuItemInfoList.length - 1;
+                final isFirstInArray = index == 0;
+
+                // Render menu item
+                return MenuItem(
+                  key: ValueKey(tile.id),
+                  info: tile,
+                  leftPadding: widget.leftPadding + 16,
+                  isLastInArray: isLastInArray,
+                  isFirstInArray: isFirstInArray,
+                );
+              }).toList()
                 ..sort((a, b) => a.info.indexInLevel.compareTo(b.info.indexInLevel)),
             )
           ],

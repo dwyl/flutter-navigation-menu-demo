@@ -82,6 +82,7 @@ class MenuItemInfo {
       if (iconCode != null) {
         return Icon(
           IconData(iconCode, fontFamily: 'MaterialIcons'),
+          size: 40,
           color: colour,
         );
       }
