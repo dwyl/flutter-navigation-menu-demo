@@ -2769,6 +2769,14 @@ of people who don't speak this language.
 It's not fair to leave them out!
 So let's add a way for users to toggle between languages.
 
+> The official `Flutter` docs
+> have a page explaining how internationalization works
+> on `Flutter` apps.
+> Although necessary, it's an interesting read
+> and will surely give you context to what we're about to implement!
+>
+> Visit https://docs.flutter.dev/accessibility-and-localization/internationalization for more information.
+
 To keep things simple, 
 we'll allow users to toggle between
 **Portuguese** and **English**.
@@ -2812,7 +2820,8 @@ let's set the
 property.
 This property has a list of locales that the app 
 *has been localized for*.
-By default, if you're running the app on a simutor,
+
+By default, if you're running the app on a simulator,
 *American English* is supported.
 Let's add another one.
 
@@ -2858,7 +2867,7 @@ It's essentially *a bridge* between the app and the localization data.
 These have in-built widgets that should also be translated.
 For these to be correctly translated,
 we need to add delegates for these.
-Luckily, `Flutter` provides us default delegates for these,
+Luckily, `Flutter` provides us default delegates,
 as well as a special delegate
 (`GlobalWidgetsLocalizations`) 
 which handles
@@ -2889,9 +2898,9 @@ everything `i18n` related under-the-hood!
 
 ### 6.2 Creating our custom delegate for localizing our own labels
 
-Let's create our own cusotm delegate 
+Let's create our own custom delegate 
 to help translate our app's labels into 
-any language we'd like.
+any language we like.
 
 For this, create a file called `app_localization.dart`
 inside `lib`.
@@ -2967,7 +2976,7 @@ Because we are extending the
 we need to override the `isSupported`, `load` and `shouldReload` functions.
 These functions are self-explanatory:
 - `isSupported` checks if a given locale is supported.
-- `load`, which given a locale it *loads* the language labels
+- `load`, which given a locale, it *loads* the language labels
 to be displayed 
 (it calls a function in `AppLocalization` that does this).
 - `shouldReload`,
@@ -2980,12 +2989,13 @@ we've defined earlier
 and three public functions:
 
 - `of`, which is a useful method
-to access the methods of the class.
+to access the methods of the class
+from widgets in an easier manner.
 - `loadLanguage`,
 which loads the translation file 
 according to the given locale.
 - `getTranslatedValue`,
-which wll be used to display the label
+which will be used to display the label
 translated to the current chosen locale of the device.
 
 Now we need to add the translation files!
@@ -3156,10 +3166,17 @@ to make it easy for the person
 to change languages within the app.
 
 If you're not aware of what a state management library is
-and don't know how `Riverpod` works,
+and/or don't know how `Riverpod` works,
 we recommend you visit 
 [`dwyl/flutter-todo-list-tutorial`](https://github.com/dwyl/flutter-todo-list-tutorial)
 to build foundational knowledge on this subject.
+
+In layman's terms, `Riverpod`
+will allow us to create and manage
+**global state** across the widget tree.
+Any widget in this tree will be able to access and modify this state.
+We'll save the **current locale** in this state,
+so any widget can change it.
 
 After installing `Riverpod`, 
 let's wrap our app with a `ProviderScope` 
