@@ -217,6 +217,43 @@ void main() {
       expect(dynamicMenuItemList, findsOneWidget);
     });
 
+    testWidgets('Navigating into dynamic menu page', (WidgetTester tester) async {
+      // Initialize app
+      await tester.pumpWidget(const ProviderScope(child: App()));
+      await tester.pumpAndSettle();
+
+      final menuButton = find.byKey(iconKey);
+      final todoItem = find.byKey(todoItemKey);
+
+      // Tap on todo item
+      await tester.tap(todoItem);
+      await tester.pumpAndSettle();
+
+      // Tap menu icon
+      await tester.tap(menuButton);
+      await tester.pumpAndSettle();
+
+      // Click on second menu item which should navigate into a page
+      final potaroMenuItem = find.text("Potaro");
+      var dynamicMenuItemPage = find.byKey(dynamicMenuPageKey);
+
+      expect(potaroMenuItem, findsOneWidget);
+      expect(dynamicMenuItemPage, findsNothing);
+
+      // Tap on "people" menu item
+      await tester.tap(potaroMenuItem);
+      await tester.pumpAndSettle();
+
+      dynamicMenuItemPage = find.byKey(dynamicMenuPageKey);
+
+      // Should show page
+      expect(dynamicMenuItemPage, findsOneWidget);
+
+      final goBackButton = find.text("Go back");
+      await tester.tap(goBackButton);
+      await tester.pumpAndSettle();
+    });
+
     testWidgets('Click on first expandable menu item', (WidgetTester tester) async {
       // Initialize app
       await tester.pumpWidget(const ProviderScope(child: App()));
