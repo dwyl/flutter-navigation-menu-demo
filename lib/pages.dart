@@ -1,9 +1,11 @@
+import 'package:app/settings.dart';
 import 'package:flutter/material.dart';
 
 import 'app_localization.dart';
 
 const tourPageKey = Key("tour_page");
 const settingsPageKey = Key("settings_page");
+const dynamicMenuPageKey = Key("dynamic_menu_page");
 
 class TourPage extends StatelessWidget {
   const TourPage({super.key});
@@ -71,6 +73,40 @@ class SettingsPage extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: const Text('Go back'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DynamicMenuPage extends StatelessWidget {
+  final MenuItemInfo menuItem;
+
+  const DynamicMenuPage({super.key, required this.menuItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: dynamicMenuPageKey,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              menuItem.title,
+              style: const TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Go back'),
+              ),
             ),
           ],
         ),

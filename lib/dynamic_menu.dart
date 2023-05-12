@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:app/pages.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 
@@ -163,6 +164,12 @@ class _MenuItemState extends State<MenuItem> {
         child: ListTile(
             contentPadding: EdgeInsets.only(left: widget.leftPadding),
             leading: widget.info.getIcon(),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => DynamicMenuPage(menuItem: widget.info)),
+              );
+            },
             title: Text(widget.info.title,
                 style: TextStyle(
                   fontSize: 25,
