@@ -53,7 +53,8 @@ building a navigation menu in `Flutter`.
         - [6.3.1.1 Translations in `assets/menu_items.json`](#6311-translations-in-assetsmenu_itemsjson)
         - [6.3.1.2 Lookup automatic translations of dynamic menu items](#6312-lookup-automatic-translations-of-dynamic-menu-items)
     - [6.4 Using `Riverpod` to toggle between languages](#64-using-riverpod-to-toggle-between-languages)
-    - [6.5 Fixing decoration when expanding titles](#65-fixing-decoration-when-expanding-titles)
+  - [7. Fixing decoration when expanding titles](#7-fixing-decoration-when-expanding-titles)
+  - [8. Adding basic navigation for each menu item](#8-adding-basic-navigation-for-each-menu-item)
 - [Star the repo! ⭐️](#star-the-repo-️)
 
 
@@ -3136,7 +3137,7 @@ For example:
 
 We could *use* these key-value pairs
 to translate the menu item title automatically.
-If the user had `PT` setup, 
+If the person had `PT` setup, 
 we would look at the `en-pt.json` file
 and try to translate if any of the keys were found.
 
@@ -3281,7 +3282,7 @@ across all the widget tree! 🎉
 </p>
 
 
-### 6.5 Fixing decoration when expanding titles
+## 7. Fixing decoration when expanding titles
 
 You might have noticed that,
 by having the borders always showing on top and bottom of each menu item,
@@ -3406,7 +3407,112 @@ Now the menu items look consistent
 across the nested menu item lists! 🥳
 
 
+## 8. Adding basic navigation for each menu item
 
+As of now, our menu items aren't really useful at all.
+Sure, they are being displayed correctly 
+but they aren't *navigating anywhere*.
+
+Luckily for us, 
+we can easily implement this!
+We'll just create a sample page
+that will display the title of the given menu item
+with a button that will allow the person to go back.
+
+Head over to `lib/pages.dart`
+and create a new *stateless widget* class.
+
+```dart
+class DynamicMenuPage extends StatelessWidget {
+  final MenuItemInfo menuItem;
+
+  const DynamicMenuPage({super.key, required this.menuItem});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: dynamicMenuPageKey,
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              menuItem.title,
+              style: const TextStyle(fontSize: 30),
+              textAlign: TextAlign.center,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text('Go back'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+```
+
+This is a simple class, similar to the other pages,
+that simply renders a `Text` with the given menu item title.
+Now we only need to *use this page*
+when rendering a leaf menu item!
+
+Head over to `lib/dynamic_menu.dart`,
+find the `_MenuItemState` class
+and its `build()` function,
+and make these changes:
+
+```dart
+  if (childrenMenuItemInfoList.isEmpty) {
+    return Container(
+      key: widget.key,
+      decoration: _renderBorderDecoration(),
+      child: ListTile(
+          contentPadding: EdgeInsets.only(left: widget.leftPadding),
+          leading: widget.info.getIcon(),
+
+          // Add this `onTap` parameter
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => DynamicMenuPage(menuItem: widget.info)),
+            );
+          },
+
+          title: Text(widget.info.title,
+              style: TextStyle(
+                fontSize: 25,
+                color: widget.info.textColor,
+              ))),
+    );
+  }
+```
+
+We've just added an `onTap` parameter,
+which is invoked whenever the user taps on the menu item.
+This simply pushes the page we've just created
+in the navigation stack,
+showing our brand new page!
+
+If you run the app,
+and click on a leaf menu item 
+(meaning it's not expandable),
+the page should be shown!
+
+
+<p align="center">
+  <img src="https://github.com/dwyl/flutter-navigation-menu-demo/assets/17494745/5d39aae4-0eec-41ba-ab37-1b3c5ae529c3" width="300" />
+</p>
+
+Hurray!
+We've got ourselves a solid dynamic menu!
+Give yourself a pat on the back 👏.
 
 # Star the repo! ⭐️
 
