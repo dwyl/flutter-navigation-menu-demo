@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "index_in_level": 0,
+    "title": "People",
+    "text_color": "#Ffb97e",
+    "icon": {
+      "colour": "#Ffb97e",
+      "code": 61668,
+      "emoji": "🧑‍🤝‍🧑",
+      "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+    },
+    "tiles": [
+      {
+        "id": 2,
+        "index_in_level": 0,
+        "title": "Online Now",
+        "text_color": "#FFFFFF",
+        "icon": {
+          "colour": "#Ffb97e",
+          "emoji": "🧑‍🤝‍🧑",
+          "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+        },
+        "tiles": [
+          {
+            "id": 3,
+            "index_in_level": 0,
+            "title": "Family",
+            "text_color": "#FFFFFF",
+            "icon": {
+              "colour": "#Ffb97e",
+              "url": "https://cdn-icons-png.flaticon.com/512/4436/4436481.png"
+            },
+            "tiles": []
+          },
+          {
+            "id": 4,
+            "index_in_level": 1,
+            "title": "Friends",
+            "text_color": "#FFFFFF",
+            "tiles": [
+              {
+                "id": 5,
+                "index_in_level": 0,
+                "title": "Sports Team",
+                "text_color": "#FFFFFF",
+                "tiles": []
+              },
+              {
+                "id": 6,
+                "index_in_level": 1,
+                "title": "Gamerz",
+                "text_color": "#FFFFFF",
+                "tiles": []
+              }
+            ]
+          },
+          {
+            "id": 7,
+            "index_in_level": 2,
+            "title": "Work",
+            "text_color": "#FFFFFF",
+            "tiles": []
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "index_in_level": 1,
+        "title": "Everyone",
+        "text_color": "#FFFFFF",
+        "tiles": []
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "index_in_level": 1,
+    "title": "Potaro",
+    "text_color": "#0baedc",
+    "tiles": []
+  }
+]
