@@ -78,13 +78,13 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/images/syslogonopayoff.png", fit: BoxFit.fitHeight, height: 30),
+            Image.asset("assets/images/32.png", fit: BoxFit.fitHeight, height: 30),
           ],
         ),
         leading: const Padding(
           padding: EdgeInsets.all(8.0),
           child: CircleAvatar(
-            backgroundImage: AssetImage("assets/images/syslogonopayoff.png"),
+            backgroundImage: AssetImage("assets/images/32.png"),
           ),
         ),
         backgroundColor: Colors.black,
