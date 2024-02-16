@@ -128,7 +128,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
             ListTile(
               key: todoItemKey,
               title: Text(
-                'check this todo item',
+                AppLocalization.of(context).getTranslatedValue("botton").toString(),
                 style: TextStyle(decoration: showMenu ? TextDecoration.lineThrough : TextDecoration.none),
               ),
               minVerticalPadding: 25.0,

@@ -1,5 +1,6 @@
 {
   "title": "This is the main page",
+  "botton": "Click this for the menu",
   "description": "Check the todo item below to open the menu above to check more pages.",
 
   "menu.todo": "Todo List (Personal)",
