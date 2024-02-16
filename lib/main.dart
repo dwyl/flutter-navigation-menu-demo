@@ -150,7 +150,7 @@ class _HomePageState extends ConsumerState<HomePage> with SingleTickerProviderSt
                         ref.read(currentLocaleProvider.notifier).state = const Locale('pt', 'PT');
                       },
                       style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 161, 30, 30)),
-                      child: const Text("PT")),
+                      child: const Text("IT")),
                   ElevatedButton(
                       key: enButtonkey,
                       onPressed: () {

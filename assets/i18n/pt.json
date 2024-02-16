@@ -3,15 +3,15 @@
     "botton": "clicca qui per far apparire il menù",
     "description": "clicca il testo per abilitare il menù",
 
-    "menu.todo": "Lista de tarefas (Pessoal)",
-    "menu.feature": "Visão geral",
-    "menu.settings": "Definições",
+    "menu.todo": "Elenco delle cose da fare (personale)",
+    "menu.feature": "Panoramica",
+    "menu.settings": "Impostazioni",
 
-    "feature_page.title": "Esta é a página de visão geral 🚩",
-    "feature_page.description": "Isto é apenas uma página de exemplo. Para voltar, clique no botão abaixo.",
+"feature_page.title": "Questa è la pagina di panoramica 🚩",
+    "feature_page.description": "Pagina di esempio",
 
-    "settings_page.title": "Esta é a página de configurações ⚙️",
-    "settings_page.description": "Isto é apenas uma página de exemplo. Para voltar, clique no botão abaixo.",
+    "settings_page.title": "Pagina delle impostazioni ⚙️",
+    "settings_page.description": "Pagina di esempio. Per tornare indietro premi il bottone sotto.",
   
     "goBack_button": "torna indietro"
   }

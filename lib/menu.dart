@@ -63,7 +63,7 @@ class _DrawerMenuState extends State<DrawerMenu> {
                     decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white), top: BorderSide(color: Colors.white))),
                     child: ListTile(
                       leading: const Icon(
-                        Icons.check_outlined,
+                        Icons.account_balance,
                         color: Colors.white,
                         size: 50,
                       ),

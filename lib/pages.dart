@@ -35,7 +35,7 @@ class TourPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Go back'),
+              child: Text(AppLocalization.of(context).getTranslatedValue("goBack_button").toString()),
             ),
           ],
         ),
@@ -72,7 +72,7 @@ class SettingsPage extends StatelessWidget {
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Go back'),
+              child: Text(AppLocalization.of(context).getTranslatedValue("goBack_button").toString()),
             ),
           ],
         ),
@@ -105,7 +105,7 @@ class DynamicMenuPage extends StatelessWidget {
                 onPressed: () {
                   Navigator.pop(context);
                 },
-                child: const Text('Go back'),
+                child:  Text(AppLocalization.of(context).getTranslatedValue("goBack_button").toString()),
               ),
             ),
           ],

@@ -2,7 +2,7 @@
   {
     "id": 1,
     "index_in_level": 0,
-    "title": "People",
+    "title": "Persone",
     "text_color": "#Ffb97e",
     "icon": {
       "colour": "#Ffb97e",
@@ -14,7 +14,7 @@
       {
         "id": 2,
         "index_in_level": 0,
-        "title": "Online Now",
+        "title": "in linea adesso",
         "text_color": "#FFFFFF",
         "icon": {
           "colour": "#Ffb97e",
@@ -25,7 +25,7 @@
           {
             "id": 3,
             "index_in_level": 0,
-            "title": "Family",
+            "title": "Famiglia",
             "text_color": "#FFFFFF",
             "icon": {
               "colour": "#Ffb97e",
@@ -36,20 +36,20 @@
           {
             "id": 4,
             "index_in_level": 1,
-            "title": "Friends",
+            "title": "Amici",
             "text_color": "#FFFFFF",
             "tiles": [
               {
                 "id": 5,
                 "index_in_level": 0,
-                "title": "Sports Team",
+                "title": "Squadra sportiva",
                 "text_color": "#FFFFFF",
                 "tiles": []
               },
               {
                 "id": 6,
                 "index_in_level": 1,
-                "title": "Gamerz",
+                "title": "Giocatori",
                 "text_color": "#FFFFFF",
                 "tiles": []
               }
@@ -58,7 +58,7 @@
           {
             "id": 7,
             "index_in_level": 2,
-            "title": "Work",
+            "title": "Lavoro",
             "text_color": "#FFFFFF",
             "tiles": []
           }
@@ -67,7 +67,7 @@
       {
         "id": 8,
         "index_in_level": 1,
-        "title": "Everyone",
+        "title": "Tutti",
         "text_color": "#FFFFFF",
         "tiles": []
       }
@@ -76,8 +76,8 @@
   {
     "id": 9,
     "index_in_level": 1,
-    "title": "Potaro",
+    "title": "Test",
     "text_color": "#0baedc",
-    "tiles": []
+    "tiles": [Bho]
   }
 ]
